@@ -2219,7 +2219,7 @@
 				AAAAAAAAAAAAAAAAAAA=
 				</data>
 				<key>boot-args</key>
-				<string>unfairgva=1 -v</string>
+				<string>unfairgva=1</string>
 				<key>csr-active-config</key>
 				<data>
 				AAAAAA==

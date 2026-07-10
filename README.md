@@ -10,7 +10,8 @@ OpenCore config for **Infinix BL51A5** (`BL51A5_NS15AB`), based on:
 | [thegwchr/RealtekBluetoothFirmware](https://github.com/thegwchr/RealtekBluetoothFirmware) | Bluetooth RTL8821C (`0bda:c821`) |
 
 > **Bukan** EFI copy-paste full dari satu repo. Hybrid: **chassis = B15**, **CPU/wireless = Axioo**.  
-> **Recovery boot** ditest di BL51A5 (partisi `OC-ESP` + `com.apple.recovery.boot`). Default: **Sequoia**. Backup Sonoma: tag `sonoma-recovery-working`.
+> **Tested on BL51A5:** Sequoia **15.7** — recovery boot, UnPlugged offline install, desktop, Wi-Fi (Starskiff), Ethernet, NootedRed post-install fix.  
+> Recovery default: **Sequoia** (`OC-ESP` + `com.apple.recovery.boot`). Backup Sonoma: tag `sonoma-recovery-working`.
 
 ---
 
@@ -37,11 +38,11 @@ OpenCore config for **Infinix BL51A5** (`BL51A5_NS15AB`), based on:
 
 1. **Base B15** — Config.plist, OpenCore 1.0.6, drivers (`OpenHfsPlus` …), kext stack, ACPI (kecuali PLUG 8-core).
 2. **Dari Axioo** — kernel patch **8-core**, `rtw88.kext`, `RealtekBluetoothFirmware` (ganti Brcm B15).
-3. **boot-args recovery**: `unfairgva=1 -v` (B15). Setelah install tambah `npci=0x3000 alcid=55 revpatch=auto,sbvmm`.
+3. **boot-args (tested Sequoia)**: `unfairgva=1` saja. Recovery verbose: tambah `-v` sementara. **Jangan** sekaligus pasang `npci=0x3000 alcid=55 revpatch=auto,sbvmm` — bikin **boot hang** di BL51A5 (sama seperti recovery dulu).
 4. **Touchpad & USB = pola B15 (Infinix)**, bukan Axioo:
    - **Touchpad**: `VoodooI2C` + `VoodooInput` (dari I2C) + `VoodooI2CHID` + `VoodooSMBus`; PS2 keyboard/mouse/trackpad plugins seperti B15; `VoodooInput` di PS2 **dimatikan** (hindari double-load).
    - **USB**: **tanpa** `USBToolBox` / `UTBMap` (map Axioo salah mesin). Pakai **SSDT-USBX + SSDT-USB-Reset + SSDT-EC + SSDT-XOSI dari B15** — sama pendekatan Infinix XBOOK.
-5. **+ RealtekRTL8111.kext** dari B15 (LAN).
+5. **RealtekRTL8111.kext v3.0.0** ([Mieze](https://github.com/Mieze/RTL8111_driver_for_OS_X/releases)) — `enableEEE=false`, `fallbackMAC` dari LAN.
 6. **Audio ALC269VC**: layout-id **55** via DeviceProperties (B15).
 7. **RealtekBluetoothFirmware**: personality **`0bda:c821`** ditambahkan.
 8. SMBIOS **MacBookPro16,2** sudah di-generate (macserial) + ROM dari MAC Wi‑Fi laptop ini. Lihat `SMBIOS.txt`.
@@ -60,7 +61,8 @@ opencore-infinix-bl51a5/
 │   ├── Config.plist
 │   └── OpenCore.efi
 ├── Extras/
-│   └── Starskiff-v1.0.0.dmg   # UI Wi-Fi (post-install)
+│   ├── Starskiff-v1.0.0.dmg   # UI Wi-Fi (post-install)
+│   └── fix-nootedred.sh       # mandatory NootedRed fix (Recovery / post-install)
 └── README.md
 ```
 
@@ -109,38 +111,135 @@ macserial -m MacBookPro16,2
 # isi ulang SystemSerialNumber + MLB di Config.plist; UUID pakai uuidgen
 ```
 
-### 2) USB installer
+### 2) Install macOS Sequoia
 
-1. Buat USB install macOS (Sequoia disarankan — target referensi Axioo).
-2. Mount EFI partition USB, copy folder `EFI/` ke root EFI partition.
+**Opsi A — USB installer**
+
+1. Buat USB install macOS Sequoia.
+2. Mount EFI USB, copy folder `EFI/` ke root EFI partition.
 3. Boot USB lewat OpenCore picker.
-4. Install ke internal disk (dual-boot: jangan timpa Windows/Linux tanpa backup).
+4. Install ke internal disk (dual-boot: jangan timpa Linux tanpa backup).
+
+**Opsi B — UnPlugged offline (tested BL51A5)**
+
+1. Siapkan partisi exFAT ~20GB (`InstallPayload`) berisi `InstallAssistant.pkg`, `UnPlugged.command`, `BaseSystem.dmg`, `fix-nootedred.sh`.
+2. Boot OpenCore → Sequoia Recovery.
+3. Erase APFS partition → `Macintosh HD`.
+4. Mount exFAT manual (`mount_exfat`) — Sequoia recovery **tidak** auto-mount exFAT.
+5. `bash UnPlugged.command` → install offline ke `Macintosh HD`.
+6. **Sebelum boot desktop:** jalankan `fix-nootedred.sh` (lihat post-install §A).
 
 ### 3) Copy EFI ke internal
 
 Setelah install, mount EFI internal, copy `EFI/` yang sama (dengan SMBIOS yang sudah diganti).
 
-### 4) Post-install (mandatory)
+### 4) Post-install (mandatory — tested Sequoia 15.7)
 
-**A. NootedRed gray screen / beachball**  
-Ikuti workaround dari Axioo README:
+#### Disk layout (dual-boot BL51A5)
 
-- [NootedRed discussion #430](https://github.com/ChefKissInc/NootedRed/discussions/430)
-- atau [issue comment](https://github.com/ChefKissInc/NootedRed/issues/235#issuecomment-4567109847)
+| Partisi | Size | Isi |
+|---------|------|-----|
+| p1 `OC-ESP` | 1.5G | OpenCore + `com.apple.recovery.boot` (Sequoia recovery) |
+| p2 `macOS` | ~248G | APFS — target install (`Macintosh HD`) |
+| p3 `InstallPayload` | 20G | exFAT — offline installer + `fix-nootedred.sh` + Starskiff (opsional) |
+| p4 | 4.9G | Linux `/boot` |
+| p5 | ~201G | CachyOS root |
 
-**B. Wi-Fi — install Starskiff**
+Copy `Extras/fix-nootedred.sh` dan `Extras/Starskiff-v1.0.0.dmg` ke partisi **InstallPayload** supaya bisa diakses dari macOS Recovery / desktop.
 
-```text
-Extras/Starskiff-v1.0.0.dmg
-→ install Starskiff.app
-→ Settings → General → Login Items → Open at Login
+---
+
+#### A. NootedRed — gray screen, About, wallpaper (WAJIB tiap fresh install)
+
+Bug NootedRed di Sonoma/Sequoia: GPU compute hang (wallpaper decode, login, System Settings → About).
+
+**Workaround resmi:** [NootedRed #235](https://github.com/ChefKissInc/NootedRed/issues/235#issuecomment-4567109847) · [discussion #430](https://github.com/ChefKissInc/NootedRed/discussions/430)
+
+**Dari Recovery** (setelah install / reinstall, sebelum boot desktop):
+
+```bash
+# Mount InstallPayload (Sequoia+ tidak auto-mount exFAT)
+diskutil list physical
+mkdir -p /Volumes/UnPlugged
+/sbin/mount_exfat /dev/disk0s3 /Volumes/UnPlugged   # sesuaikan disk0s3
+
+bash /Volumes/UnPlugged/fix-nootedred.sh "Macintosh HD"
+reboot
 ```
 
-Connect SSID lewat **Starskiff**, bukan cuma Wi-Fi menu Apple (driver non-native).
+Atau manual:
 
-**C. Bluetooth**
+```bash
+defaults write "/Volumes/Macintosh HD/Library/Preferences/com.apple.coremedia" allowMetalTransferSession -bool NO
+chmod 644 "/Volumes/Macintosh HD/Library/Preferences/com.apple.coremedia.plist"
+```
 
-Cek log firmware:
+**Dari Linux (CachyOS)** — kalau sudah boot Linux, bisa apply tanpa Recovery:
+
+```bash
+sudo modprobe apfs
+sudo mount -t apfs -o vol=0 /dev/nvme0n1p2 /mnt/macos-p2
+sudo tee /mnt/macos-p2/Library/Preferences/com.apple.coremedia.plist > /dev/null << 'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict><key>allowMetalTransferSession</key><false/></dict></plist>
+EOF
+sudo chmod 644 /mnt/macos-p2/Library/Preferences/com.apple.coremedia.plist
+sudo umount /mnt/macos-p2
+```
+
+**Wallpaper (penting — tested):**
+
+| Wallpaper | Hasil di NootedRed + Sequoia |
+|-----------|------------------------------|
+| **Color** (solid) | ✅ Aman — About tampil, boot normal |
+| **Pictures** / dynamic (`.mov`, Sequoia Sunrise, dll.) | ❌ `gpuRestart`, About hilang/crash setelah reboot |
+| Memoji avatar | ❌ Hindari |
+
+`fix-nootedred.sh` juga reset wallpaper user ke **Color**. Setelah fix, **jangan** ganti ke Pictures/dynamic.
+
+---
+
+#### B. Wi-Fi — install Starskiff
+
+RTL8821CE bukan chip Apple — menu Wi-Fi native **tidak jalan**. Driver `rtw88.kext` sudah di EFI.
+
+```text
+Extras/Starskiff-v1.0.0.dmg  (atau dari /Volumes/UnPlugged/)
+→ drag Starskiff.app ke Applications
+→ System Settings → General → Login Items → Open at Login
+→ connect SSID lewat app Starskiff (bukan menu Wi-Fi Apple)
+```
+
+Mount InstallPayload dari macOS desktop:
+
+```bash
+sudo mkdir -p /Volumes/UnPlugged
+sudo /sbin/mount_exfat /dev/disk0s3 /Volumes/UnPlugged
+open /Volumes/UnPlugged/Starskiff-v1.0.0.dmg
+```
+
+Verifikasi driver:
+
+```bash
+kextstat | grep -i rtw
+```
+
+---
+
+#### C. Ethernet
+
+`RealtekRTL8111.kext` **v3.0.0** sudah di EFI. Port biasanya **en1** (Wi-Fi Starskiff = en0).
+
+```bash
+kextstat | grep -i realtek
+networksetup -listallhardwareports
+sudo networksetup -setdhcp Ethernet
+```
+
+---
+
+#### D. Bluetooth
 
 ```bash
 log show --last boot --predicate 'eventMessage CONTAINS "RealtekFirmware"'
@@ -148,29 +247,36 @@ log show --last boot --predicate 'eventMessage CONTAINS "RealtekFirmware"'
 
 Harus kelihatan match chip + `firmware download complete`.
 
-**D. Audio layout**
+---
 
-Kalau speaker/mic salah:
+#### E. Audio layout
 
-1. Ganti `alcid=` di boot-args: coba `11`, `13`, `28`, `33`, `55`, `66`, `99` (umum ALC269).
-2. Samakan `DeviceProperties` → `layout-id` dengan angka yang sama.
-3. Reboot tiap percobaan.
+Default: `layout-id` **55** di DeviceProperties. Kalau speaker/mic salah, coba `alcid=` satu per satu (jangan batch dengan npci/revpatch):
 
-**E. USB**
+`11`, `13`, `28`, `33`, `55`, `66`, `99` — samakan dengan `DeviceProperties` → `layout-id`, reboot tiap percobaan.
+
+---
+
+#### F. Boot-args lanjutan (hati-hati)
+
+Config default: `unfairgva=1` — **tested boot OK** di Sequoia.
+
+Referensi Axioo memakai `npci=0x3000 alcid=55 revpatch=auto,sbvmm` — di **BL51A5 ini menyebabkan boot hang** kalau dipasang sekaligus. Kalau mau eksperimen, tambah **satu argumen per reboot**, bukan sekaligus.
+
+---
+
+#### G. USB
 
 Default mengikuti **B15**: SSDT power/reset saja, semua port native (tidak ada UTBMap Axioo).
 
-Kalau setelah stabil ingin map ketat (power/sleep lebih rapi):
+Kalau setelah stabil ingin map ketat: [USBToolBox](https://github.com/USBToolBox/tool) → map **khusus BL51A5**. BT (`0bda:c821`) & webcam (`1bcf:2864`) harus enabled.
 
-1. Pakai [USBToolBox](https://github.com/USBToolBox/tool) di Windows/macOS → buat map **khusus BL51A5**.
-2. Jangan pakai `UTBMap` dari Axioo/B15 orang lain.
-3. BT (`0bda:c821`) & webcam (`1bcf:2864`) harus tetap enabled di map.
+---
 
-**F. Lain**
+#### H. Lain
 
 ```bash
 sudo systemsetup -settimezone Asia/Jakarta
-# Hackintool → Power → icon screwdriver (fix power defaults) — opsional
 ```
 
 ---
@@ -211,16 +317,19 @@ NVMeFix, RestrictEvents, ECEnabler, BrightnessKeys, ...
 
 ## Troubleshooting cepat
 
-| Gejala | Coba |
-|--------|------|
-| Stuck gray + beachball | NootedRed workaround (atas) |
-| Wi-Fi kosong di Starskiff | Cek `rtw88.kext` loaded; `dmesg` / log `rtw88` |
-| BT hilang | USB map; log `RealtekFirmware`; pastikan personality `c821` |
-| No audio | Ganti `alcid` / layout-id |
+| Gejala | Fix (tested Sequoia) |
+|--------|----------------------|
+| Gray screen + beachball (first boot) | Jalankan `Extras/fix-nootedred.sh` dari Recovery — **wajib tiap reinstall** |
+| About This Mac / System Settings → About hilang | Sama: NootedRed fix + wallpaper **Color** saja (bukan Pictures/dynamic) |
+| About hilang setelah ganti wallpaper + reboot | Reset ke Color: `fix-nootedred.sh` atau hapus `SystemWallpaperURL` di `com.apple.wallpaper.plist` |
+| Boot hang setelah ubah boot-args | Revert ke `unfairgva=1` saja → **Reset NVRAM** di OpenCore picker → boot lagi |
+| Wi-Fi kosong di Starskiff | `kextstat \| grep rtw`; boot lewat OpenCore (bukan direct) |
+| Ethernet no IP | Cek **en1** (bukan en0); `networksetup -setdhcp Ethernet` |
+| BT hilang | Log `RealtekFirmware`; personality `0bda:c821` |
+| No audio | Ganti `layout-id` / `alcid` satu per satu |
 | KP sleep | Disable SMCLightSensor sementara; cek USB map |
-| Ethernet down | Pastikan `RealtekRTL8111` enabled |
 
-Verbose boot: di OpenCore picker, tekan `Space` → pilih verbose, atau tambah `-v` di boot-args sementara.
+Verbose boot: OpenCore picker → `Space` → verbose, atau tambah `-v` di boot-args sementara (recovery only).
 
 ---
 

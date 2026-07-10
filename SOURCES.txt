@@ -1,6 +1,6 @@
 Built: 2026-07-10 for Infinix BL51A5 (Ryzen 7 5825U, RTL8821CE)
-Tested: Sonoma recovery boot OK on BL51A5 (2026-07-10) — backup tag sonoma-recovery-working
-Recovery default: Sequoia (recovery-sequoia-oc BaseSystem.dmg)
+Tested: Sequoia 15.7 install + desktop on BL51A5 (2026-07-11)
+Recovery: Sequoia BaseSystem.dmg on OC-ESP (tag sonoma-recovery-working = Sonoma backup)
 
 Base (config, OpenCore 1.0.6, drivers, kexts, ACPI, boot-args):
   https://github.com/kodeaqua/opencore-infinix-xbook-b15
@@ -9,10 +9,12 @@ CPU + wireless only (8-core patches, rtw88, Realtek BT):
   https://github.com/kodeaqua/opencore-axioo-hype7-amd-x7-2
 
 Wi-Fi UI post-install: Starskiff v1.0.0 (Extras/)
+NootedRed fix script: Extras/fix-nootedred.sh
 
 Local edits:
 - Config: B15 base + Axioo 8-core kernel patches + Realtek BT/Wi-Fi (no Brcm/HoRNDIS)
-- boot-args recovery: unfairgva=1 -v (B15). Post-install: add npci/alcid/revpatch
+- boot-args (tested Sequoia): unfairgva=1 — do NOT batch-add npci/revpatch (hangs on BL51A5)
+- RealtekRTL8111.kext v3.0.0 (Mieze) — enableEEE=false, fallbackMAC from LAN
 - Drivers: OpenHfsPlus, OpenRuntime, ResetNvramEntry, OpenCanopy (B15)
 - SSDT-PLUG-ALT: 8-core (5825U), rest ACPI from B15
 - RealtekBluetoothFirmware Info.plist: personality 0bda:c821
