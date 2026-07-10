@@ -1,0 +1,243 @@
+# OpenCore EFI — Infinix XBOOK 15 (BL51A5)
+
+OpenCore config for **Infinix BL51A5** (`BL51A5_NS15AB`), based on:
+
+| Referensi | Dipakai untuk |
+|-----------|----------------|
+| [kodeaqua/opencore-axioo-hype7-amd-x7-2](https://github.com/kodeaqua/opencore-axioo-hype7-amd-x7-2) | Base utama: **Ryzen 7 5825U**, NootedRed, AMD patches (8-core), **Feixiao `rtw88`**, **RealtekBluetoothFirmware**, BlueToolFixup |
+| [kodeaqua/opencore-infinix-xbook-b15](https://github.com/kodeaqua/opencore-infinix-xbook-b15) | Infinix lineage: **ALC269VC** layout, **RealtekRTL8111**, DeviceProperties path |
+| [thegwchr/Feixiao](https://github.com/thegwchr/Feixiao) + [Starskiff](https://github.com/thegwchr/Starskiff) | Wi-Fi RTL8821CE |
+| [thegwchr/RealtekBluetoothFirmware](https://github.com/thegwchr/RealtekBluetoothFirmware) | Bluetooth RTL8821C (`0bda:c821`) |
+
+> **Bukan** EFI copy-paste full dari satu repo. Hybrid yang disesuaikan ke hardware laptop ini.  
+> **Belum ditest di mesin ini** — butuh trial di USB dulu.
+
+---
+
+## Hardware target (dari dump Linux)
+
+| Komponen | Detail |
+|----------|--------|
+| Model | Infinix **BL51A5** (XBOOK15) |
+| Board | `EM_AB336_MB_CY_V1.0` |
+| BIOS | `BL51A5_AB336_XBOOK15_V1.10` |
+| CPU | AMD **Ryzen 7 5825U** (8C/16T, Zen 3 / Cezanne) |
+| iGPU | AMD Radeon **Barcelo** (`1002:15e7`) |
+| Wi-Fi | Realtek **RTL8821CE** PCIe (`10ec:c821`) |
+| Bluetooth | Realtek USB **`0bda:c821`** (HCI 4.2 / RTL8821C) |
+| Ethernet | Realtek **RTL8111/8168** (`10ec:8168`) |
+| Audio | Realtek **ALC269VC** (`10ec:0269`) |
+| Trackpad | I2C HID `36B6:C001` (`PNP0C50`) |
+| Storage | NVMe (MAXIO MAP1202 di unit ini) |
+| SMBIOS | **MacBookPro16,2** (placeholder) |
+
+---
+
+## Apa yang diubah dari referensi
+
+1. **Base Axioo** (CPU + wireless stack) — core patch **8**, `rtw88.kext`, Realtek BT.
+2. **+ RealtekRTL8111.kext** dari B15 (LAN built-in).
+3. **Audio ALC269VC**: `alcid=55` + DeviceProperties layout-id **55** (baseline B15; bisa diganti).
+4. **USB map Axioo dihapus** (`UTBMap` removed, `USBToolBox` disabled) — port map mesin lain berbahaya; semua port dibiarkan native dulu + `SSDT-USBX`.
+5. **RealtekBluetoothFirmware**: personality **`0bda:c821`** ditambahkan (asli kext punya `c822` dll., belum `c821`).
+6. SMBIOS **placeholder** — wajib diganti (GenSMBIOS).
+
+---
+
+## Isi folder
+
+```
+opencore-infinix-bl51a5/
+├── EFI/OC/                 # bootloader
+│   ├── ACPI/
+│   ├── Drivers/
+│   ├── Kexts/
+│   ├── Resources/
+│   ├── Config.plist
+│   └── OpenCore.efi
+├── Extras/
+│   └── Starskiff-v1.0.0.dmg   # UI Wi-Fi (post-install)
+└── README.md
+```
+
+### Stack wireless (penting)
+
+| Role | Kext / app |
+|------|------------|
+| Wi-Fi driver | `rtw88.kext` (Feixiao) |
+| Wi-Fi UI | **Starskiff.app** (bukan System Settings native) |
+| BT firmware | `RealtekBluetoothFirmware.kext` |
+| BT Monterey+ | `BlueToolFixup.kext` |
+| Dependency | `Lilu.kext` |
+
+---
+
+## BIOS (wajib)
+
+Seperti referensi Infinix/AMD laptop. **Jangan main engineer-level BIOS** (risiko brick di XBOOK).
+
+- Secure Boot → **Disabled**
+- Fast Boot → **Disabled**
+- CSM → **Disabled**
+- IOMMU → **Disabled** (kalau ada)
+- Above 4G Decoding → **Enabled** (kalau ada)
+- UMA / iGPU memory → **Game Optimized / 1G** (sesuaikan opsi BIOS)
+- VT-d / SVM: biarkan default yang stabil; dual boot Linux/Windows sering butuh SVM on
+
+---
+
+## Install singkat
+
+### 1) Generate SMBIOS (wajib)
+
+Jangan pakai serial di repo.
+
+```bash
+# di macOS / Windows / Linux (Python)
+# https://github.com/corpnewt/GenSMBIOS
+# Product: MacBookPro16,2
+# Isi SystemSerialNumber, MLB, SystemUUID ke Config.plist → PlatformInfo → Generic
+# ROM: 6 byte MAC (boleh random)
+```
+
+Tanpa serial unik: iMessage / iCloud bermasalah, dan bentrok serial.
+
+### 2) USB installer
+
+1. Buat USB install macOS (Sequoia disarankan — target referensi Axioo).
+2. Mount EFI partition USB, copy folder `EFI/` ke root EFI partition.
+3. Boot USB lewat OpenCore picker.
+4. Install ke internal disk (dual-boot: jangan timpa Windows/Linux tanpa backup).
+
+### 3) Copy EFI ke internal
+
+Setelah install, mount EFI internal, copy `EFI/` yang sama (dengan SMBIOS yang sudah diganti).
+
+### 4) Post-install (mandatory)
+
+**A. NootedRed gray screen / beachball**  
+Ikuti workaround dari Axioo README:
+
+- [NootedRed discussion #430](https://github.com/ChefKissInc/NootedRed/discussions/430)
+- atau [issue comment](https://github.com/ChefKissInc/NootedRed/issues/235#issuecomment-4567109847)
+
+**B. Wi-Fi — install Starskiff**
+
+```text
+Extras/Starskiff-v1.0.0.dmg
+→ install Starskiff.app
+→ Settings → General → Login Items → Open at Login
+```
+
+Connect SSID lewat **Starskiff**, bukan cuma Wi-Fi menu Apple (driver non-native).
+
+**C. Bluetooth**
+
+Cek log firmware:
+
+```bash
+log show --last boot --predicate 'eventMessage CONTAINS "RealtekFirmware"'
+```
+
+Harus kelihatan match chip + `firmware download complete`.
+
+**D. Audio layout**
+
+Kalau speaker/mic salah:
+
+1. Ganti `alcid=` di boot-args: coba `11`, `13`, `28`, `33`, `55`, `66`, `99` (umum ALC269).
+2. Samakan `DeviceProperties` → `layout-id` dengan angka yang sama.
+3. Reboot tiap percobaan.
+
+**E. USB map (setelah stabil)**
+
+1. Pakai [USBToolBox](https://github.com/USBToolBox/tool) di Windows/macOS → buat map BL51A5.
+2. Taruh `UTBMap.kext` di `Kexts/`.
+3. Enable `USBToolBox.kext` + entry map di `Config.plist`.
+4. BT & webcam butuh port internal tetap **enabled** di map.
+
+**F. Lain**
+
+```bash
+sudo systemsetup -settimezone Asia/Jakarta
+# Hackintool → Power → icon screwdriver (fix power defaults) — opsional
+```
+
+---
+
+## Yang diharapkan jalan / tidak
+
+| Fitur | Ekspektasi |
+|-------|------------|
+| Boot + install | Ya (uji USB dulu) |
+| iGPU (NootedRed) | Ya, dengan post-install fix |
+| Keyboard / trackpad I2C | Ya (VoodooPS2 + VoodooI2C/HID) |
+| Ethernet | Ya (RTL8111) |
+| Wi-Fi 8821CE | Ya lewat Feixiao + Starskiff (non-Airport) |
+| Bluetooth 8821C | Ya lewat RealtekBluetoothFirmware (+ map USB) |
+| Audio ALC269VC | Ya dengan layout tuning |
+| Battery / sleep | Biasanya ok; perlu fine-tune |
+| Continuity / AirDrop native | **Jangan harap penuh** (Realtek non-native) |
+| Touchpad perfect | Bisa flaky (sama referensi Axioo) |
+
+---
+
+## Kext order (sudah di-set)
+
+```
+Lilu
+VirtualSMC → AMDRyzenCPUPowerManagement → SMCAMDProcessor → sensors/battery
+NootedRed
+AppleALC
+RealtekRTL8111
+rtw88
+BlueToolFixup → RealtekBluetoothFirmware
+VoodooPS2 (+ Input, Keyboard)
+VoodooI2C (+ GPIO, Services) → VoodooI2CHID
+NVMeFix, RestrictEvents, ECEnabler, BrightnessKeys, ...
+```
+
+---
+
+## Troubleshooting cepat
+
+| Gejala | Coba |
+|--------|------|
+| Stuck gray + beachball | NootedRed workaround (atas) |
+| Wi-Fi kosong di Starskiff | Cek `rtw88.kext` loaded; `dmesg` / log `rtw88` |
+| BT hilang | USB map; log `RealtekFirmware`; pastikan personality `c821` |
+| No audio | Ganti `alcid` / layout-id |
+| KP sleep | Disable SMCLightSensor sementara; cek USB map |
+| Ethernet down | Pastikan `RealtekRTL8111` enabled |
+
+Verbose boot: di OpenCore picker, tekan `Space` → pilih verbose, atau tambah `-v` di boot-args sementara.
+
+---
+
+## Dual-boot (Linux sudah ada)
+
+- OpenCore di EFI **terpisah** atau rantai-boot hati-hati.
+- Backup partisi EFI sekarang (`efibootmgr` / copy full EFI) sebelum timpa.
+- Jangan `rm -rf` EFI Windows/Linux.
+
+---
+
+## Disclaimer
+
+- Risiko brick BIOS / data loss ada di pihak user.
+- Jangan jadikan macOS OS utama di laptop ini (saran author B15 tetap valid).
+- Kext experimental (Feixiao, RealtekBT, NootedRed CI builds).
+- Serial/SMBIOS di config **dummy** — ganti dulu.
+
+---
+
+## Credits
+
+- Acidanthera (OpenCore, Lilu, VirtualSMC, AppleALC, …)
+- ChefKissInc / NootedRed
+- AMD-OSX / algrey patches
+- kodeaqua (Axioo Hype 7 + Infinix B15 EFI)
+- thegwchr (Feixiao, Starskiff, RealtekBluetoothFirmware)
+- Mieze (RealtekRTL8111)
+- VoodooI2C team
+- Dortania OpenCore Install Guide

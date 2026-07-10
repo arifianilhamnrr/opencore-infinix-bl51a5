@@ -1,0 +1,12 @@
+Built: 2026-07-10 for Infinix BL51A5 (Ryzen 7 5825U, RTL8821CE)
+
+Base EFI/kexts: https://github.com/kodeaqua/opencore-axioo-hype7-amd-x7-2
+Ethernet kext + ALC layout reference: https://github.com/kodeaqua/opencore-infinix-xbook-b15
+Wi-Fi: Feixiao rtw88 (bundled in Axioo EFI) + Starskiff v1.0.0 DMG
+BT: RealtekBluetoothFirmware (bundled) + personality 0bda:c821 added locally
+
+Local edits:
+- Config.plist hybrid (audio, ethernet, USB map off, boot-args, DeviceProperties)
+- RealtekBluetoothFirmware Info.plist: add idProduct 0xc821
+- Removed UTBMap.kext (Axioo-specific USB map)
+- Added RealtekRTL8111.kext from B15
