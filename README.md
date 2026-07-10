@@ -4,8 +4,8 @@ OpenCore config for **Infinix BL51A5** (`BL51A5_NS15AB`), based on:
 
 | Referensi | Dipakai untuk |
 |-----------|----------------|
-| [kodeaqua/opencore-axioo-hype7-amd-x7-2](https://github.com/kodeaqua/opencore-axioo-hype7-amd-x7-2) | Base utama: **Ryzen 7 5825U**, NootedRed, AMD patches (8-core), **Feixiao `rtw88`**, **RealtekBluetoothFirmware**, BlueToolFixup |
-| [kodeaqua/opencore-infinix-xbook-b15](https://github.com/kodeaqua/opencore-infinix-xbook-b15) | Infinix lineage: **ALC269VC** layout, **RealtekRTL8111**, DeviceProperties path |
+| [kodeaqua/opencore-axioo-hype7-amd-x7-2](https://github.com/kodeaqua/opencore-axioo-hype7-amd-x7-2) | Base CPU/wireless: **Ryzen 7 5825U**, NootedRed, AMD patches (8-core), **Feixiao `rtw88`**, **RealtekBluetoothFirmware**, BlueToolFixup |
+| [kodeaqua/opencore-infinix-xbook-b15](https://github.com/kodeaqua/opencore-infinix-xbook-b15) | **Chassis Infinix**: touchpad (VoodooI2C/HID/SMBus), USB via SSDT, **ALC269VC**, **RealtekRTL8111**, DeviceProperties |
 | [thegwchr/Feixiao](https://github.com/thegwchr/Feixiao) + [Starskiff](https://github.com/thegwchr/Starskiff) | Wi-Fi RTL8821CE |
 | [thegwchr/RealtekBluetoothFirmware](https://github.com/thegwchr/RealtekBluetoothFirmware) | Bluetooth RTL8821C (`0bda:c821`) |
 
@@ -35,11 +35,13 @@ OpenCore config for **Infinix BL51A5** (`BL51A5_NS15AB`), based on:
 
 ## Apa yang diubah dari referensi
 
-1. **Base Axioo** (CPU + wireless stack) — core patch **8**, `rtw88.kext`, Realtek BT.
-2. **+ RealtekRTL8111.kext** dari B15 (LAN built-in).
-3. **Audio ALC269VC**: `alcid=55` + DeviceProperties layout-id **55** (baseline B15; bisa diganti).
-4. **USB map Axioo dihapus** (`UTBMap` removed, `USBToolBox` disabled) — port map mesin lain berbahaya; semua port dibiarkan native dulu + `SSDT-USBX`.
-5. **RealtekBluetoothFirmware**: personality **`0bda:c821`** ditambahkan (asli kext punya `c822` dll., belum `c821`).
+1. **Base Axioo** (CPU + wireless) — core patch **8**, `rtw88.kext`, Realtek BT, NootedRed.
+2. **Touchpad & USB = pola B15 (Infinix)**, bukan Axioo:
+   - **Touchpad**: `VoodooI2C` + `VoodooInput` (dari I2C) + `VoodooI2CHID` + `VoodooSMBus`; PS2 keyboard/mouse/trackpad plugins seperti B15; `VoodooInput` di PS2 **dimatikan** (hindari double-load).
+   - **USB**: **tanpa** `USBToolBox` / `UTBMap` (map Axioo salah mesin). Pakai **SSDT-USBX + SSDT-USB-Reset + SSDT-EC + SSDT-XOSI dari B15** — sama pendekatan Infinix XBOOK.
+3. **+ RealtekRTL8111.kext** dari B15 (LAN).
+4. **Audio ALC269VC**: `alcid=55` + layout-id **55** (baseline B15; bisa diganti).
+5. **RealtekBluetoothFirmware**: personality **`0bda:c821`** ditambahkan.
 6. SMBIOS **placeholder** — wajib diganti (GenSMBIOS).
 
 ---
@@ -149,12 +151,15 @@ Kalau speaker/mic salah:
 2. Samakan `DeviceProperties` → `layout-id` dengan angka yang sama.
 3. Reboot tiap percobaan.
 
-**E. USB map (setelah stabil)**
+**E. USB**
 
-1. Pakai [USBToolBox](https://github.com/USBToolBox/tool) di Windows/macOS → buat map BL51A5.
-2. Taruh `UTBMap.kext` di `Kexts/`.
-3. Enable `USBToolBox.kext` + entry map di `Config.plist`.
-4. BT & webcam butuh port internal tetap **enabled** di map.
+Default mengikuti **B15**: SSDT power/reset saja, semua port native (tidak ada UTBMap Axioo).
+
+Kalau setelah stabil ingin map ketat (power/sleep lebih rapi):
+
+1. Pakai [USBToolBox](https://github.com/USBToolBox/tool) di Windows/macOS → buat map **khusus BL51A5**.
+2. Jangan pakai `UTBMap` dari Axioo/B15 orang lain.
+3. BT (`0bda:c821`) & webcam (`1bcf:2864`) harus tetap enabled di map.
 
 **F. Lain**
 
@@ -192,8 +197,8 @@ AppleALC
 RealtekRTL8111
 rtw88
 BlueToolFixup → RealtekBluetoothFirmware
-VoodooPS2 (+ Input, Keyboard)
-VoodooI2C (+ GPIO, Services) → VoodooI2CHID
+VoodooPS2Controller (+ Keyboard, Mouse, Trackpad; Input OFF)
+VoodooI2C (+ GPIO, Services, Input) → VoodooI2CHID → VoodooSMBus   # B15 style
 NVMeFix, RestrictEvents, ECEnabler, BrightnessKeys, ...
 ```
 
