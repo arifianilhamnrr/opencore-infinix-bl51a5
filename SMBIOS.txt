@@ -1,0 +1,15 @@
+# SMBIOS for this machine only — do not share / re-use on another Hackintosh
+# Generated with acidanthera macserial (MacBookPro16,2)
+# ROM derived from this laptop WiFi MAC
+
+SystemProductName:  MacBookPro16,2
+SystemSerialNumber: C02FN2YUML7H
+MLB:                C02118404GUP8PG1F
+SystemUUID:         C77BE4A5-F32C-43E9-9699-BCBFDBBDCB8B
+ROM:                8CEA12C14320  (WiFi MAC 8c:ea:12:c1:43:20)
+
+After install, check:
+  System Settings → General → About
+  Or: sysctl -n machdep.cpu.brand_string; ioreg -l | grep IOPlatformSerialNumber
+
+If iMessage fails: regenerate with macserial -m MacBookPro16,2 and replace values.

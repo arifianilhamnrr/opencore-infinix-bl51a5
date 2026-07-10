@@ -42,7 +42,7 @@ OpenCore config for **Infinix BL51A5** (`BL51A5_NS15AB`), based on:
 3. **+ RealtekRTL8111.kext** dari B15 (LAN).
 4. **Audio ALC269VC**: `alcid=55` + layout-id **55** (baseline B15; bisa diganti).
 5. **RealtekBluetoothFirmware**: personality **`0bda:c821`** ditambahkan.
-6. SMBIOS **placeholder** — wajib diganti (GenSMBIOS).
+6. SMBIOS **MacBookPro16,2** sudah di-generate (macserial) + ROM dari MAC Wi‑Fi laptop ini. Lihat `SMBIOS.txt`.
 
 ---
 
