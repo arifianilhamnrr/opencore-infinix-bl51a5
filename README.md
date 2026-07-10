@@ -4,13 +4,13 @@ OpenCore config for **Infinix BL51A5** (`BL51A5_NS15AB`), based on:
 
 | Referensi | Dipakai untuk |
 |-----------|----------------|
-| [kodeaqua/opencore-axioo-hype7-amd-x7-2](https://github.com/kodeaqua/opencore-axioo-hype7-amd-x7-2) | Base CPU/wireless: **Ryzen 7 5825U**, NootedRed, AMD patches (8-core), **Feixiao `rtw88`**, **RealtekBluetoothFirmware**, BlueToolFixup |
-| [kodeaqua/opencore-infinix-xbook-b15](https://github.com/kodeaqua/opencore-infinix-xbook-b15) | **Chassis Infinix**: touchpad (VoodooI2C/HID/SMBus), USB via SSDT, **ALC269VC**, **RealtekRTL8111**, DeviceProperties |
+| [kodeaqua/opencore-infinix-xbook-b15](https://github.com/kodeaqua/opencore-infinix-xbook-b15) | **Base config** (OpenCore 1.0.6, drivers, kexts, ACPI, touchpad, USB, audio, boot-args recovery) |
+| [kodeaqua/opencore-axioo-hype7-amd-x7-2](https://github.com/kodeaqua/opencore-axioo-hype7-amd-x7-2) | Hanya **CPU 5825U**: kernel patch 8-core, **`rtw88`**, **RealtekBluetoothFirmware** |
 | [thegwchr/Feixiao](https://github.com/thegwchr/Feixiao) + [Starskiff](https://github.com/thegwchr/Starskiff) | Wi-Fi RTL8821CE |
 | [thegwchr/RealtekBluetoothFirmware](https://github.com/thegwchr/RealtekBluetoothFirmware) | Bluetooth RTL8821C (`0bda:c821`) |
 
-> **Bukan** EFI copy-paste full dari satu repo. Hybrid yang disesuaikan ke hardware laptop ini.  
-> **Belum ditest di mesin ini** — butuh trial di USB dulu.
+> **Bukan** EFI copy-paste full dari satu repo. Hybrid: **chassis = B15**, **CPU/wireless = Axioo**.  
+> **Recovery boot Sonoma** sudah ditest di BL51A5 (partisi `OC-ESP` + `com.apple.recovery.boot`).
 
 ---
 
@@ -35,14 +35,16 @@ OpenCore config for **Infinix BL51A5** (`BL51A5_NS15AB`), based on:
 
 ## Apa yang diubah dari referensi
 
-1. **Base Axioo** (CPU + wireless) — core patch **8**, `rtw88.kext`, Realtek BT, NootedRed.
-2. **Touchpad & USB = pola B15 (Infinix)**, bukan Axioo:
+1. **Base B15** — Config.plist, OpenCore 1.0.6, drivers (`OpenHfsPlus` …), kext stack, ACPI (kecuali PLUG 8-core).
+2. **Dari Axioo** — kernel patch **8-core**, `rtw88.kext`, `RealtekBluetoothFirmware` (ganti Brcm B15).
+3. **boot-args recovery**: `unfairgva=1 -v` (B15). Setelah install tambah `npci=0x3000 alcid=55 revpatch=auto,sbvmm`.
+4. **Touchpad & USB = pola B15 (Infinix)**, bukan Axioo:
    - **Touchpad**: `VoodooI2C` + `VoodooInput` (dari I2C) + `VoodooI2CHID` + `VoodooSMBus`; PS2 keyboard/mouse/trackpad plugins seperti B15; `VoodooInput` di PS2 **dimatikan** (hindari double-load).
    - **USB**: **tanpa** `USBToolBox` / `UTBMap` (map Axioo salah mesin). Pakai **SSDT-USBX + SSDT-USB-Reset + SSDT-EC + SSDT-XOSI dari B15** — sama pendekatan Infinix XBOOK.
-3. **+ RealtekRTL8111.kext** dari B15 (LAN).
-4. **Audio ALC269VC**: `alcid=55` + layout-id **55** (baseline B15; bisa diganti).
-5. **RealtekBluetoothFirmware**: personality **`0bda:c821`** ditambahkan.
-6. SMBIOS **MacBookPro16,2** sudah di-generate (macserial) + ROM dari MAC Wi‑Fi laptop ini. Lihat `SMBIOS.txt`.
+5. **+ RealtekRTL8111.kext** dari B15 (LAN).
+6. **Audio ALC269VC**: layout-id **55** via DeviceProperties (B15).
+7. **RealtekBluetoothFirmware**: personality **`0bda:c821`** ditambahkan.
+8. SMBIOS **MacBookPro16,2** sudah di-generate (macserial) + ROM dari MAC Wi‑Fi laptop ini. Lihat `SMBIOS.txt`.
 
 ---
 
@@ -90,19 +92,22 @@ Seperti referensi Infinix/AMD laptop. **Jangan main engineer-level BIOS** (risik
 
 ## Install singkat
 
-### 1) Generate SMBIOS (wajib)
+### 1) SMBIOS (sudah diisi)
 
-Jangan pakai serial di repo.
+`Config.plist` → `PlatformInfo` → `Generic` sudah di-set:
+
+| Field | Value |
+|-------|--------|
+| Model | `MacBookPro16,2` |
+| Serial / MLB / UUID | lihat `SMBIOS.txt` (juga di Config) |
+| ROM | MAC Wi‑Fi laptop ini (`8c:ea:12:c1:43:20`) |
+
+**Jangan** pakai serial ini di mesin lain. Kalau repo publik di-clone orang lain dan mereka pakai serial yang sama, iMessage/iCloud bisa bermasalah — regenerate:
 
 ```bash
-# di macOS / Windows / Linux (Python)
-# https://github.com/corpnewt/GenSMBIOS
-# Product: MacBookPro16,2
-# Isi SystemSerialNumber, MLB, SystemUUID ke Config.plist → PlatformInfo → Generic
-# ROM: 6 byte MAC (boleh random)
+macserial -m MacBookPro16,2
+# isi ulang SystemSerialNumber + MLB di Config.plist; UUID pakai uuidgen
 ```
-
-Tanpa serial unik: iMessage / iCloud bermasalah, dan bentrok serial.
 
 ### 2) USB installer
 
@@ -232,7 +237,7 @@ Verbose boot: di OpenCore picker, tekan `Space` → pilih verbose, atau tambah `
 - Risiko brick BIOS / data loss ada di pihak user.
 - Jangan jadikan macOS OS utama di laptop ini (saran author B15 tetap valid).
 - Kext experimental (Feixiao, RealtekBT, NootedRed CI builds).
-- Serial/SMBIOS di config **dummy** — ganti dulu.
+- SMBIOS di config **sudah di-generate untuk laptop ini**; jangan share/reuse di PC lain.
 
 ---
 
