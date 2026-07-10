@@ -10,7 +10,7 @@ OpenCore config for **Infinix BL51A5** (`BL51A5_NS15AB`), based on:
 | [thegwchr/RealtekBluetoothFirmware](https://github.com/thegwchr/RealtekBluetoothFirmware) | Bluetooth RTL8821C (`0bda:c821`) |
 
 > **Bukan** EFI copy-paste full dari satu repo. Hybrid: **chassis = B15**, **CPU/wireless = Axioo**.  
-> **Recovery boot Sonoma** sudah ditest di BL51A5 (partisi `OC-ESP` + `com.apple.recovery.boot`).
+> **Recovery boot** ditest di BL51A5 (partisi `OC-ESP` + `com.apple.recovery.boot`). Default: **Sequoia**. Backup Sonoma: tag `sonoma-recovery-working`.
 
 ---
 

@@ -1,5 +1,6 @@
 Built: 2026-07-10 for Infinix BL51A5 (Ryzen 7 5825U, RTL8821CE)
-Tested: Sonoma recovery boot OK on BL51A5 (2026-07-10)
+Tested: Sonoma recovery boot OK on BL51A5 (2026-07-10) — backup tag sonoma-recovery-working
+Recovery default: Sequoia (recovery-sequoia-oc BaseSystem.dmg)
 
 Base (config, OpenCore 1.0.6, drivers, kexts, ACPI, boot-args):
   https://github.com/kodeaqua/opencore-infinix-xbook-b15
@@ -15,4 +16,4 @@ Local edits:
 - Drivers: OpenHfsPlus, OpenRuntime, ResetNvramEntry, OpenCanopy (B15)
 - SSDT-PLUG-ALT: 8-core (5825U), rest ACPI from B15
 - RealtekBluetoothFirmware Info.plist: personality 0bda:c821
-- Recovery: Sonoma BaseSystem.dmg in com.apple.recovery.boot on OC-ESP partition
+- Recovery: Sequoia BaseSystem.dmg in com.apple.recovery.boot on OC-ESP partition
