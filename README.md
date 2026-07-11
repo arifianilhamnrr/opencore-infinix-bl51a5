@@ -94,8 +94,6 @@ Sama seperti [B15](https://github.com/kodeaqua/opencore-infinix-xbook-b15) — o
 
 **Jangan** ubah menu engineer/advanced BIOS (risiko brick — ada laporan motherboard replace dari service center di B15).
 
-Dual-boot Linux/Windows: **SVM** (AMD-V) biasanya perlu **Enabled**; sisanya ikut tabel di atas.
-
 ---
 
 ## Install singkat
