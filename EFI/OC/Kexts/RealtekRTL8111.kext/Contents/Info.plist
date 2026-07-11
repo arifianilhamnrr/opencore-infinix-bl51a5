@@ -61,7 +61,7 @@
 				<key>enableTSO6</key>
 				<true/>
 				<key>fallbackMAC</key>
-				<string>50:a1:32:60:ea:92</string>
+				<string></string>
 			</dict>
 			<key>DriverVersion</key>
 			<string>3.0.4</string>

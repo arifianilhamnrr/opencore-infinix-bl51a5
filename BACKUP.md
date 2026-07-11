@@ -6,7 +6,7 @@ State saat recovery **Sonoma** confirmed boot OK di BL51A5.
 |------|--------|
 | Git tag | `sonoma-recovery-working` (commit `a0a0666`) |
 | Git branch | `backup/sonoma-recovery-working` |
-| Local snapshot | `~/opencore-infinix-bl51a5-backup-sonoma-working/` |
+| Local snapshot | folder backup lokal (opsional, tidak di repo) |
 
 ## Restore Sonoma recovery
 

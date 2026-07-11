@@ -1,5 +1,5 @@
-Built: 2026-07-10 for Infinix BL51A5 (Ryzen 7 5825U, RTL8821CE)
-Tested: Sequoia 15.7 install + desktop on BL51A5 (2026-07-11)
+Built: 2026-07-10 for Infinix BL51A5 class (Ryzen 7 5825U, RTL8821CE)
+Tested profile: BL51A5 + macOS Sequoia 15.7 (community report)
 Recovery: Sequoia BaseSystem.dmg on OC-ESP (tag sonoma-recovery-working = Sonoma backup)
 
 Base (config, OpenCore 1.0.6, drivers, kexts, ACPI, boot-args):
@@ -13,9 +13,9 @@ NootedRed fix script: Extras/fix-nootedred.sh
 
 Local edits:
 - Config: B15 base + Axioo 8-core kernel patches + Realtek BT/Wi-Fi (no Brcm/HoRNDIS)
-- boot-args (tested Sequoia): unfairgva=1 — do NOT batch-add npci/revpatch (hangs on BL51A5)
-- RealtekRTL8111.kext v3.0.0 (Mieze) — enableEEE=false, fallbackMAC from LAN
+- SMBIOS: MacBookPro16,2 PLACEHOLDERS — user must generate (see SMBIOS.txt)
+- boot-args default: unfairgva=1
+- RealtekRTL8111.kext v3.0.0 (Mieze) — enableEEE=false
 - Drivers: OpenHfsPlus, OpenRuntime, ResetNvramEntry, OpenCanopy (B15)
 - SSDT-PLUG-ALT: 8-core (5825U), rest ACPI from B15
 - RealtekBluetoothFirmware Info.plist: personality 0bda:c821
-- Recovery: Sequoia BaseSystem.dmg in com.apple.recovery.boot on OC-ESP partition

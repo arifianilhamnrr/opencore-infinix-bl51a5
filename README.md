@@ -1,6 +1,8 @@
 # OpenCore EFI — Infinix XBOOK 15 (BL51A5)
 
-OpenCore config for **Infinix BL51A5** (`BL51A5_NS15AB`), based on:
+OpenCore config untuk laptop **Infinix BL51A5** / chassis serupa **Infinix XBOOK B15** + CPU **AMD Ryzen 7 5825U** (sama kelas Axioo Hype 7 AMD X7-2).
+
+Berdasarkan:
 
 | Referensi | Dipakai untuk |
 |-----------|----------------|
@@ -9,13 +11,14 @@ OpenCore config for **Infinix BL51A5** (`BL51A5_NS15AB`), based on:
 | [thegwchr/Feixiao](https://github.com/thegwchr/Feixiao) + [Starskiff](https://github.com/thegwchr/Starskiff) | Wi-Fi RTL8821CE |
 | [thegwchr/RealtekBluetoothFirmware](https://github.com/thegwchr/RealtekBluetoothFirmware) | Bluetooth RTL8821C (`0bda:c821`) |
 
-> **Bukan** EFI copy-paste full dari satu repo. Hybrid: **chassis = B15**, **CPU/wireless = Axioo**.  
-> **Tested on BL51A5:** Sequoia **15.7** — recovery boot, UnPlugged offline install, desktop, Wi-Fi (Starskiff), Ethernet, NootedRed post-install fix.  
-> Recovery default: **Sequoia** (`OC-ESP` + `com.apple.recovery.boot`). Backup Sonoma: tag `sonoma-recovery-working`.
+> **Bukan** EFI copy-paste dari satu repo. Hybrid: **chassis = B15**, **CPU/wireless = Axioo**.  
+> **SMBIOS di repo = placeholder** — wajib diganti sendiri sebelum dipakai (lihat `SMBIOS.txt`).  
+> **Laporan uji di BL51A5:** macOS Sequoia **15.7** — recovery, UnPlugged offline install, desktop, Wi-Fi (Starskiff), Ethernet, fix NootedRed.  
+> Recovery default: **Sequoia**. Backup Sonoma: tag `sonoma-recovery-working`.
 
 ---
 
-## Hardware target (dari dump Linux)
+## Hardware target
 
 | Komponen | Detail |
 |----------|--------|
@@ -29,8 +32,8 @@ OpenCore config for **Infinix BL51A5** (`BL51A5_NS15AB`), based on:
 | Ethernet | Realtek **RTL8111/8168** (`10ec:8168`) |
 | Audio | Realtek **ALC269VC** (`10ec:0269`) |
 | Trackpad | I2C HID `36B6:C001` (`PNP0C50`) |
-| Storage | NVMe (MAXIO MAP1202 di unit ini) |
-| SMBIOS | **MacBookPro16,2** (placeholder) |
+| Storage | NVMe |
+| SMBIOS | **MacBookPro16,2** (disarankan NootedRed; isi sendiri) |
 
 ---
 
@@ -38,14 +41,14 @@ OpenCore config for **Infinix BL51A5** (`BL51A5_NS15AB`), based on:
 
 1. **Base B15** — Config.plist, OpenCore 1.0.6, drivers (`OpenHfsPlus` …), kext stack, ACPI (kecuali PLUG 8-core).
 2. **Dari Axioo** — kernel patch **8-core**, `rtw88.kext`, `RealtekBluetoothFirmware` (ganti Brcm B15).
-3. **boot-args (tested Sequoia)**: `unfairgva=1` saja. Recovery verbose: tambah `-v` sementara. **Jangan** sekaligus pasang `npci=0x3000 alcid=55 revpatch=auto,sbvmm` — bikin **boot hang** di BL51A5 (sama seperti recovery dulu).
+3. **boot-args default**: `unfairgva=1`. Recovery verbose: tambah `-v` sementara. Di BL51A5, pasang sekaligus `npci=0x3000 alcid=55 revpatch=auto,sbvmm` dilaporkan **boot hang** — tambah satu per satu kalau mau eksperimen.
 4. **Touchpad & USB = pola B15 (Infinix)**, bukan Axioo:
    - **Touchpad**: `VoodooI2C` + `VoodooInput` (dari I2C) + `VoodooI2CHID` + `VoodooSMBus`; PS2 keyboard/mouse/trackpad plugins seperti B15; `VoodooInput` di PS2 **dimatikan** (hindari double-load).
    - **USB**: **tanpa** `USBToolBox` / `UTBMap` (map Axioo salah mesin). Pakai **SSDT-USBX + SSDT-USB-Reset + SSDT-EC + SSDT-XOSI dari B15** — sama pendekatan Infinix XBOOK.
-5. **RealtekRTL8111.kext v3.0.0** ([Mieze](https://github.com/Mieze/RTL8111_driver_for_OS_X/releases)) — `enableEEE=false`, `fallbackMAC` dari LAN.
+5. **RealtekRTL8111.kext v3.0.0** ([Mieze](https://github.com/Mieze/RTL8111_driver_for_OS_X/releases)) — `enableEEE=false`; `fallbackMAC` opsional (kosongkan atau isi MAC LAN kamu).
 6. **Audio ALC269VC**: layout-id **55** via DeviceProperties (B15).
 7. **RealtekBluetoothFirmware**: personality **`0bda:c821`** ditambahkan.
-8. SMBIOS **MacBookPro16,2** sudah di-generate (macserial) + ROM dari MAC Wi‑Fi laptop ini. Lihat `SMBIOS.txt`.
+8. SMBIOS **MacBookPro16,2** — template placeholder di `Config.plist` / `SMBIOS.txt`; **harus diganti** per mesin.
 
 ---
 
@@ -94,22 +97,34 @@ Seperti referensi Infinix/AMD laptop. **Jangan main engineer-level BIOS** (risik
 
 ## Install singkat
 
-### 1) SMBIOS (sudah diisi)
+### 1) SMBIOS (wajib — isi sendiri)
 
-`Config.plist` → `PlatformInfo` → `Generic` sudah di-set:
+`Config.plist` → `PlatformInfo` → `Generic` berisi **placeholder**:
 
-| Field | Value |
-|-------|--------|
-| Model | `MacBookPro16,2` |
-| Serial / MLB / UUID | lihat `SMBIOS.txt` (juga di Config) |
-| ROM | MAC Wi‑Fi laptop ini (`8c:ea:12:c1:43:20`) |
-
-**Jangan** pakai serial ini di mesin lain. Kalau repo publik di-clone orang lain dan mereka pakai serial yang sama, iMessage/iCloud bisa bermasalah — regenerate:
+| Field | Nilai di repo | Yang harus kamu lakukan |
+|-------|---------------|-------------------------|
+| `SystemProductName` | `MacBookPro16,2` | Bisa tetap (cocok NootedRed laptop AMD) |
+| `SystemSerialNumber` | `XXXXXXXXXXXX` | Generate unik per mesin |
+| `MLB` | `M0000000000000001` | Generate unik per mesin |
+| `SystemUUID` | `00000000-0000-0000-0000-000000000000` | `uuidgen` → UUID baru |
+| `ROM` | placeholder (`ESIzRFVm`) | Ganti dengan MAC Wi‑Fi internal (6 byte, base64) |
 
 ```bash
+# Serial + MLB
 macserial -m MacBookPro16,2
-# isi ulang SystemSerialNumber + MLB di Config.plist; UUID pakai uuidgen
+# Cek valid/invalid: https://checkcoverage.apple.com
+
+# UUID
+uuidgen
+
+# ROM dari MAC Wi-Fi (contoh aa:bb:cc:dd:ee:ff)
+echo -n "aabbccddeeff" | xxd -r -p | base64
+# Paste hasil base64 ke Config.plist → PlatformInfo → Generic → ROM (type data)
 ```
+
+Detail dan contoh: `SMBIOS.txt`.
+
+**Penting:** Jangan pakai SMBIOS orang lain dari repo/GitHub. Satu serial = satu mesin (iMessage, iCloud, Apple ID).
 
 ### 2) Install macOS Sequoia
 
@@ -120,7 +135,7 @@ macserial -m MacBookPro16,2
 3. Boot USB lewat OpenCore picker.
 4. Install ke internal disk (dual-boot: jangan timpa Linux tanpa backup).
 
-**Opsi B — UnPlugged offline (tested BL51A5)**
+**Opsi B — UnPlugged offline**
 
 1. Siapkan partisi exFAT ~20GB (`InstallPayload`) berisi `InstallAssistant.pkg`, `UnPlugged.command`, `BaseSystem.dmg`, `fix-nootedred.sh`.
 2. Boot OpenCore → Sequoia Recovery.
@@ -135,17 +150,18 @@ Setelah install, mount EFI internal, copy `EFI/` yang sama (dengan SMBIOS yang s
 
 ### 4) Post-install (mandatory — tested Sequoia 15.7)
 
-#### Disk layout (dual-boot BL51A5)
+#### Contoh layout disk (dual-boot)
 
-| Partisi | Size | Isi |
-|---------|------|-----|
-| p1 `OC-ESP` | 1.5G | OpenCore + `com.apple.recovery.boot` (Sequoia recovery) |
-| p2 `macOS` | ~248G | APFS — target install (`Macintosh HD`) |
-| p3 `InstallPayload` | 20G | exFAT — offline installer + `fix-nootedred.sh` + Starskiff (opsional) |
-| p4 | 4.9G | Linux `/boot` |
-| p5 | ~201G | CachyOS root |
+Sesuaikan dengan disk kamu. Contoh yang dipakai saat pengujian:
 
-Copy `Extras/fix-nootedred.sh` dan `Extras/Starskiff-v1.0.0.dmg` ke partisi **InstallPayload** supaya bisa diakses dari macOS Recovery / desktop.
+| Partisi | Peran |
+|---------|--------|
+| EFI kecil (FAT32) | OpenCore + opsional `com.apple.recovery.boot` |
+| APFS besar | Target macOS (`Macintosh HD`) |
+| exFAT ~20GB (opsional) | Offline installer + `fix-nootedred.sh` + Starskiff |
+| Partisi OS lain | Linux / Windows — jangan timpa tanpa backup |
+
+Copy `Extras/fix-nootedred.sh` dan `Extras/Starskiff-v1.0.0.dmg` ke partisi exFAT agar bisa di-mount dari Recovery (Sequoia tidak auto-mount exFAT).
 
 ---
 
@@ -174,18 +190,18 @@ defaults write "/Volumes/Macintosh HD/Library/Preferences/com.apple.coremedia" a
 chmod 644 "/Volumes/Macintosh HD/Library/Preferences/com.apple.coremedia.plist"
 ```
 
-**Dari Linux (CachyOS)** — kalau sudah boot Linux, bisa apply tanpa Recovery:
+**Dari Linux host** (dual-boot) — tanpa Recovery, butuh `linux-apfs-rw` / `apfs` module:
 
 ```bash
 sudo modprobe apfs
-sudo mount -t apfs -o vol=0 /dev/nvme0n1p2 /mnt/macos-p2
-sudo tee /mnt/macos-p2/Library/Preferences/com.apple.coremedia.plist > /dev/null << 'EOF'
+sudo mount -t apfs -o vol=0 /dev/nvme0n1pX /mnt/macos   # sesuaikan partisi APFS
+sudo tee /mnt/macos/Library/Preferences/com.apple.coremedia.plist > /dev/null << 'EOF'
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0"><dict><key>allowMetalTransferSession</key><false/></dict></plist>
 EOF
-sudo chmod 644 /mnt/macos-p2/Library/Preferences/com.apple.coremedia.plist
-sudo umount /mnt/macos-p2
+sudo chmod 644 /mnt/macos/Library/Preferences/com.apple.coremedia.plist
+sudo umount /mnt/macos
 ```
 
 **Wallpaper (penting — tested):**
@@ -261,7 +277,7 @@ Default: `layout-id` **55** di DeviceProperties. Kalau speaker/mic salah, coba `
 
 Config default: `unfairgva=1` — **tested boot OK** di Sequoia.
 
-Referensi Axioo memakai `npci=0x3000 alcid=55 revpatch=auto,sbvmm` — di **BL51A5 ini menyebabkan boot hang** kalau dipasang sekaligus. Kalau mau eksperimen, tambah **satu argumen per reboot**, bukan sekaligus.
+Referensi Axioo memakai `npci=0x3000 alcid=55 revpatch=auto,sbvmm` — di BL51A5 dilaporkan **boot hang** kalau dipasang sekaligus. Eksperimen **satu argumen per reboot**.
 
 ---
 
@@ -276,7 +292,7 @@ Kalau setelah stabil ingin map ketat: [USBToolBox](https://github.com/USBToolBox
 #### H. Lain
 
 ```bash
-sudo systemsetup -settimezone Asia/Jakarta
+sudo systemsetup -settimezone <Your/Timezone>   # contoh: Asia/Jakarta
 ```
 
 ---
@@ -333,20 +349,20 @@ Verbose boot: OpenCore picker → `Space` → verbose, atau tambah `-v` di boot-
 
 ---
 
-## Dual-boot (Linux sudah ada)
+## Dual-boot
 
-- OpenCore di EFI **terpisah** atau rantai-boot hati-hati.
-- Backup partisi EFI sekarang (`efibootmgr` / copy full EFI) sebelum timpa.
-- Jangan `rm -rf` EFI Windows/Linux.
+- Backup EFI (`efibootmgr -v` / copy folder EFI) sebelum mengubah partisi.
+- OpenCore bisa di partisi EFI terpisah atau digabung — jangan timpa bootloader OS lain tanpa cadangan.
+- Jangan hapus EFI Windows/Linux secara sembarangan.
 
 ---
 
 ## Disclaimer
 
-- Risiko brick BIOS / data loss ada di pihak user.
-- Jangan jadikan macOS OS utama di laptop ini (saran author B15 tetap valid).
-- Kext experimental (Feixiao, RealtekBT, NootedRed CI builds).
-- SMBIOS di config **sudah di-generate untuk laptop ini**; jangan share/reuse di PC lain.
+- Hackintosh = risiko data loss, update macOS bisa break, BIOS salah setting bisa brick.
+- Repo ini **template/config** — bukan dukungan resmi Apple.
+- Kext pihak ketiga (Feixiao, RealtekBT, NootedRed, dll.) bersifat experimental.
+- **SMBIOS placeholder wajib diganti** sebelum dipakai. Jangan commit/publish serial asli kamu ke repo publik.
 
 ---
 

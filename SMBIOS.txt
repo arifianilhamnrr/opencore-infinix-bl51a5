@@ -1,15 +1,26 @@
-# SMBIOS for this machine only — do not share / re-use on another Hackintosh
-# Generated with acidanthera macserial (MacBookPro16,2)
-# ROM derived from this laptop WiFi MAC
+# SMBIOS — ISI SENDIRI sebelum pakai (wajib)
+#
+# Config.plist berisi PLACEHOLDER. Jangan boot macOS dengan nilai bawaan repo.
+# Satu serial/UUID hanya untuk satu mesin — jangan share ke orang lain.
 
 SystemProductName:  MacBookPro16,2
-SystemSerialNumber: C02FN2YUML7H
-MLB:                C02118404GUP8PG1F
-SystemUUID:         C77BE4A5-F32C-43E9-9699-BCBFDBBDCB8B
-ROM:                8CEA12C14320  (WiFi MAC 8c:ea:12:c1:43:20)
 
-After install, check:
-  System Settings → General → About
-  Or: sysctl -n machdep.cpu.brand_string; ioreg -l | grep IOPlatformSerialNumber
+# Generate serial + MLB (valid / invalid dicek di https://checkcoverage.apple.com)
+#   macserial -m MacBookPro16,2
+SystemSerialNumber: XXXXXXXXXXXX
+MLB:                M0000000000000001
 
-If iMessage fails: regenerate with macserial -m MacBookPro16,2 and replace values.
+# Generate UUID baru per mesin:
+#   uuidgen
+SystemUUID:         00000000-0000-0000-0000-000000000000
+
+# ROM = 6 byte MAC Wi-Fi internal (tanpa titik dua), lalu base64 di Config.plist
+# Contoh: Wi-Fi MAC aa:bb:cc:dd:ee:ff → hex aabbccddeeff
+#   echo -n "aabbccddeeff" | xxd -r -p | base64
+#   → isi data ROM di PlatformInfo → Generic → ROM
+ROM (hex):          xxxxxxxxxxxx
+ROM (Config base64): ESIzRFVm   # placeholder — GANTI
+
+# Setelah isi, cek:
+#   System Settings → General → About
+#   ioreg -l | grep IOPlatformSerialNumber
