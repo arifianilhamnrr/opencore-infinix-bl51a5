@@ -1,15 +1,13 @@
 # OpenCore EFI — Infinix XBOOK 15 (BL51A5)
 
-OpenCore config untuk laptop **Infinix BL51A5** / chassis serupa **Infinix XBOOK B15** + CPU **AMD Ryzen 7 5825U** (sama kelas Axioo Hype 7 AMD X7-2).
+OpenCore config untuk **Infinix BL51A5**, dengan referensi:
 
-Berdasarkan:
+| Repo | Dipakai untuk |
+|------|----------------|
+| [opencore-infinix-xbook-b15](https://github.com/kodeaqua/opencore-infinix-xbook-b15) | Chassis Infinix XBOOK (**Ryzen 5**) — base config, ACPI, touchpad, USB, audio |
+| [opencore-axioo-hype7-amd-x7-2](https://github.com/kodeaqua/opencore-axioo-hype7-amd-x7-2) | CPU/wireless AMD (**Ryzen 7 5825U**) — kernel patch, `rtw88`, Realtek BT |
 
-| Referensi | Dipakai untuk |
-|-----------|----------------|
-| [kodeaqua/opencore-infinix-xbook-b15](https://github.com/kodeaqua/opencore-infinix-xbook-b15) | **Base config** (OpenCore 1.0.6, drivers, kexts, ACPI, touchpad, USB, audio, boot-args recovery) |
-| [kodeaqua/opencore-axioo-hype7-amd-x7-2](https://github.com/kodeaqua/opencore-axioo-hype7-amd-x7-2) | Hanya **CPU 5825U**: kernel patch 8-core, **`rtw88`**, **RealtekBluetoothFirmware** |
-| [thegwchr/Feixiao](https://github.com/thegwchr/Feixiao) + [Starskiff](https://github.com/thegwchr/Starskiff) | Wi-Fi RTL8821CE |
-| [thegwchr/RealtekBluetoothFirmware](https://github.com/thegwchr/RealtekBluetoothFirmware) | Bluetooth RTL8821C (`0bda:c821`) |
+Wi-Fi UI: [Starskiff](https://github.com/thegwchr/Starskiff) · Driver: [Feixiao `rtw88`](https://github.com/thegwchr/Feixiao) · BT: [RealtekBluetoothFirmware](https://github.com/thegwchr/RealtekBluetoothFirmware)
 
 > **SMBIOS di repo = placeholder** — wajib diganti sendiri sebelum dipakai (lihat `SMBIOS.txt`).
 > **Laporan uji di BL51A5:** macOS Sequoia **15.7** — recovery, UnPlugged offline install, desktop, Wi-Fi (Starskiff), Ethernet, fix NootedRed.  
