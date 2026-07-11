@@ -143,7 +143,7 @@ Detail dan contoh: `SMBIOS.txt`.
 3. Erase APFS partition → `Macintosh HD`.
 4. Mount exFAT manual (`mount_exfat`) — Sequoia recovery **tidak** auto-mount exFAT.
 5. `bash UnPlugged.command` → install offline ke `Macintosh HD`.
-6. **Sebelum boot desktop:** jalankan `fix-nootedred.sh` (lihat post-install §A).
+6. **Sebelum boot desktop:** jalankan `fix-nootedred.sh` (lihat **A. NootedRed** di post-install).
 
 ### 3) Copy EFI ke internal
 
@@ -354,7 +354,7 @@ Verbose boot: OpenCore picker → `Space` → verbose, atau tambah `-v` di boot-
 
 - Backup EFI (`efibootmgr -v` / copy folder EFI) sebelum mengubah partisi.
 - OpenCore bisa di partisi EFI terpisah atau digabung — jangan timpa bootloader OS lain tanpa cadangan.
-- Jangan hapus EFI Windows/Linux secara sembarangan.
+- Jangan hapus EFI bootloader OS lain secara sembarangan.
 
 ---
 
