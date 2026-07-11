@@ -81,15 +81,20 @@ opencore-infinix-bl51a5/
 
 ## BIOS (wajib)
 
-Seperti referensi Infinix/AMD laptop. **Jangan main engineer-level BIOS** (risiko brick di XBOOK).
+Sama seperti [B15](https://github.com/kodeaqua/opencore-infinix-xbook-b15) — opsi berikut **ada semua** di BIOS Infinix XBOOK (BL51A5 / BL15A5). Update BIOS ke versi terbaru dulu.
 
-- Secure Boot → **Disabled**
-- Fast Boot → **Disabled**
-- CSM → **Disabled**
-- IOMMU → **Disabled** (kalau ada)
-- Above 4G Decoding → **Enabled** (kalau ada)
-- UMA / iGPU memory → **Game Optimized / 1G** (sesuaikan opsi BIOS)
-- VT-d / SVM: biarkan default yang stabil; dual boot Linux/Windows sering butuh SVM on
+| Setting | Nilai |
+|---------|--------|
+| Secure Boot | **Disabled** |
+| Fast Boot | **Disabled** |
+| CSM | **Disabled** |
+| IOMMU | **Disabled** |
+| Above 4G Decoding | **Enabled** |
+| UMA / GPU VRAM | **Game Optimized** |
+
+**Jangan** ubah menu engineer/advanced BIOS (risiko brick — ada laporan motherboard replace dari service center di B15).
+
+Dual-boot Linux/Windows: **SVM** (AMD-V) biasanya perlu **Enabled**; sisanya ikut tabel di atas.
 
 ---
 
