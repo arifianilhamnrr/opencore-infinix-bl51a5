@@ -34,18 +34,19 @@ Wi-Fi UI: [Starskiff](https://github.com/thegwchr/Starskiff) · Driver: [Feixiao
 
 ---
 
-## Apa yang diubah dari referensi
+## Perbedaan dengan referensi
 
-1. **Base B15** — Config.plist, OpenCore 1.0.6, drivers (`OpenHfsPlus` …), kext stack, ACPI (kecuali PLUG 8-core).
-2. **Dari Axioo** — kernel patch **8-core**, `rtw88.kext`, `RealtekBluetoothFirmware` (ganti Brcm B15).
-3. **boot-args default**: `unfairgva=1`. Recovery verbose: tambah `-v` sementara. Di BL51A5, pasang sekaligus `npci=0x3000 alcid=55 revpatch=auto,sbvmm` dilaporkan **boot hang** — tambah satu per satu kalau mau eksperimen.
-4. **Touchpad & USB = pola B15 (Infinix)**, bukan Axioo:
-   - **Touchpad**: `VoodooI2C` + `VoodooInput` (dari I2C) + `VoodooI2CHID` + `VoodooSMBus`; PS2 keyboard/mouse/trackpad plugins seperti B15; `VoodooInput` di PS2 **dimatikan** (hindari double-load).
-   - **USB**: **tanpa** `USBToolBox` / `UTBMap` (map Axioo salah mesin). Pakai **SSDT-USBX + SSDT-USB-Reset + SSDT-EC + SSDT-XOSI dari B15** — sama pendekatan Infinix XBOOK.
-5. **RealtekRTL8111.kext v3.0.0** ([Mieze](https://github.com/Mieze/RTL8111_driver_for_OS_X/releases)) — `enableEEE=false`; `fallbackMAC` opsional (kosongkan atau isi MAC LAN kamu).
-6. **Audio ALC269VC**: layout-id **55** via DeviceProperties (B15).
-7. **RealtekBluetoothFirmware**: personality **`0bda:c821`** ditambahkan.
-8. SMBIOS **MacBookPro16,2** — template placeholder di `Config.plist` / `SMBIOS.txt`; **harus diganti** per mesin.
+**BL51A5 dan [B15](https://github.com/kodeaqua/opencore-infinix-xbook-b15) = laptop/chassis Infinix XBOOK yang sama.** Bedanya cuma CPU: B15 pakai **Ryzen 5**, BL51A5 pakai **Ryzen 7 5825U** (setara kelas [Axioo Hype 7](https://github.com/kodeaqua/opencore-axioo-hype7-amd-x7-2)).
+
+| Aspek | Sumber | Catatan |
+|-------|--------|---------|
+| Config, OpenCore, drivers, kexts, ACPI, touchpad, USB, audio, Ethernet | **B15** | Ikut mesin Infinix — tidak diambil dari Axioo |
+| Kernel patch (8-core), `rtw88`, Realtek BT | **Axioo** | Ganti bagian CPU + wireless; Brcm/HoRNDIS B15 tidak dipakai |
+| `SSDT-PLUG` | **Axioo** (8-core) | Satu-satunya ACPI yang disesuaikan untuk Ryzen 7 |
+| `boot-args` | `unfairgva=1` | Tambah `-v` saat recovery/debug. Argumen Axioo (`npci`, `revpatch`, dll.) coba **satu per satu** — sekaligus dilaporkan boot hang |
+| SMBIOS | **MacBookPro16,2** | Placeholder di repo — generate sendiri (`SMBIOS.txt`) |
+
+**Tetap dari B15 (chassis sama):** VoodooI2C/HID touchpad, SSDT USB Infinix, `AppleALC` layout 55, `RealtekRTL8111` v3.0.0, tanpa `USBToolBox`/`UTBMap` Axioo.
 
 ---
 
