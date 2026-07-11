@@ -11,8 +11,7 @@ Berdasarkan:
 | [thegwchr/Feixiao](https://github.com/thegwchr/Feixiao) + [Starskiff](https://github.com/thegwchr/Starskiff) | Wi-Fi RTL8821CE |
 | [thegwchr/RealtekBluetoothFirmware](https://github.com/thegwchr/RealtekBluetoothFirmware) | Bluetooth RTL8821C (`0bda:c821`) |
 
-> **Bukan** EFI copy-paste dari satu repo. Hybrid: **chassis = B15**, **CPU/wireless = Axioo**.  
-> **SMBIOS di repo = placeholder** — wajib diganti sendiri sebelum dipakai (lihat `SMBIOS.txt`).  
+> **SMBIOS di repo = placeholder** — wajib diganti sendiri sebelum dipakai (lihat `SMBIOS.txt`).
 > **Laporan uji di BL51A5:** macOS Sequoia **15.7** — recovery, UnPlugged offline install, desktop, Wi-Fi (Starskiff), Ethernet, fix NootedRed.  
 > Recovery default: **Sequoia**. Backup Sonoma: tag `sonoma-recovery-working`.
 
