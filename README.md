@@ -134,7 +134,7 @@ Detail dan contoh: `SMBIOS.txt`.
 1. Buat USB install macOS Sequoia.
 2. Mount EFI USB, copy folder `EFI/` ke root EFI partition.
 3. Boot USB lewat OpenCore picker.
-4. Install ke internal disk (dual-boot: jangan timpa Linux tanpa backup).
+4. Install ke internal disk — jangan timpa partisi/OS yang sudah ada tanpa backup.
 
 **Opsi B — UnPlugged offline**
 
@@ -160,7 +160,7 @@ Sesuaikan dengan disk kamu. Contoh yang dipakai saat pengujian:
 | EFI kecil (FAT32) | OpenCore + opsional `com.apple.recovery.boot` |
 | APFS besar | Target macOS (`Macintosh HD`) |
 | exFAT ~20GB (opsional) | Offline installer + `fix-nootedred.sh` + Starskiff |
-| Partisi OS lain | Linux / Windows — jangan timpa tanpa backup |
+| Partisi OS lain | OS yang sudah terpasang — jangan timpa tanpa backup |
 
 Copy `Extras/fix-nootedred.sh` dan `Extras/Starskiff-v1.0.0.dmg` ke partisi exFAT agar bisa di-mount dari Recovery (Sequoia tidak auto-mount exFAT).
 
@@ -191,7 +191,7 @@ defaults write "/Volumes/Macintosh HD/Library/Preferences/com.apple.coremedia" a
 chmod 644 "/Volumes/Macintosh HD/Library/Preferences/com.apple.coremedia.plist"
 ```
 
-**Dari Linux host** (dual-boot) — tanpa Recovery, butuh `linux-apfs-rw` / `apfs` module:
+**Alternatif dari OS lain** (mis. Linux dengan dual-boot) — tanpa Recovery, butuh modul `apfs` read-write:
 
 ```bash
 sudo modprobe apfs
