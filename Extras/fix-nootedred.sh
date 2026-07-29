@@ -1,5 +1,5 @@
 #!/bin/bash
-# NootedRed post-install fix — tested Sequoia 15.7 on Infinix BL51A5
+# NootedRed post-install fix — tested on Sequoia 15.7 and Tahoe 26.5, Infinix BL51A5
 # https://github.com/ChefKissInc/NootedRed/issues/235#issuecomment-4567109847
 #
 # Run from macOS Recovery → Utilities → Terminal

@@ -15,4 +15,5 @@ git checkout sonoma-recovery-working
 # copy EFI/ ke OC-ESP, lalu recovery-sonoma/ ke com.apple.recovery.boot/
 ```
 
-Current `main` uses **Sequoia** recovery on OC-ESP.
+Recovery image pada `main` tetap **Sequoia**. EFI OpenCore pada `main` merupakan
+snapshot yang diuji di **Tahoe 26.5** dan sebelumnya bekerja di **Sequoia 15.7**.

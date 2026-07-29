@@ -1,6 +1,6 @@
 # SMBIOS — ISI SENDIRI sebelum pakai (wajib)
 #
-# Config.plist berisi PLACEHOLDER. Jangan boot macOS dengan nilai bawaan repo.
+# config.plist berisi PLACEHOLDER. Jangan boot macOS dengan nilai bawaan repo.
 # Satu serial/UUID hanya untuk satu mesin — jangan share ke orang lain.
 
 SystemProductName:  MacBookPro16,2
@@ -14,7 +14,7 @@ MLB:                M0000000000000001
 #   uuidgen
 SystemUUID:         00000000-0000-0000-0000-000000000000
 
-# ROM = 6 byte MAC Wi-Fi internal (tanpa titik dua), lalu base64 di Config.plist
+# ROM = 6 byte MAC Wi-Fi internal (tanpa titik dua), lalu base64 di config.plist
 # Contoh: Wi-Fi MAC aa:bb:cc:dd:ee:ff → hex aabbccddeeff
 #   echo -n "aabbccddeeff" | xxd -r -p | base64
 #   → isi data ROM di PlatformInfo → Generic → ROM

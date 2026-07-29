@@ -1,8 +1,8 @@
-Built: 2026-07-10 for Infinix BL51A5 class (Ryzen 7 5825U, RTL8821CE)
-Tested profile: BL51A5 + macOS Sequoia 15.7 (community report)
+Updated: 2026-07-29 from the working EFI on Infinix BL51A5
+Tested profile: BL51A5 + macOS Tahoe 26.5 (direct) and Sequoia 15.7 (previous)
 Recovery: Sequoia BaseSystem.dmg on OC-ESP (tag sonoma-recovery-working = Sonoma backup)
 
-Base (config, OpenCore 1.0.6, drivers, kexts, ACPI, boot-args):
+Original base (config, drivers, kexts, ACPI):
   https://github.com/kodeaqua/opencore-infinix-xbook-b15
 
 CPU + wireless only (8-core patches, rtw88, Realtek BT):
@@ -12,10 +12,11 @@ Wi-Fi UI post-install: Starskiff v1.0.0 (Extras/)
 NootedRed fix script: Extras/fix-nootedred.sh
 
 Local edits:
-- Config: B15 base + Axioo 8-core kernel patches + Realtek BT/Wi-Fi (no Brcm/HoRNDIS)
+- Config: working Tahoe snapshot + Axioo 8-core kernel patches + Realtek BT/Wi-Fi (no Brcm/HoRNDIS)
 - SMBIOS: MacBookPro16,2 PLACEHOLDERS — user must generate (see SMBIOS.txt)
-- boot-args default: unfairgva=1
-- RealtekRTL8111.kext v3.0.0 (Mieze) — enableEEE=false
+- boot-args default: revcpu=1 -NRedDPDelay
+- RealtekRTL8111.kext v3.0.4 — enableEEE=false, fallback MAC anonymized
 - Drivers: OpenHfsPlus, OpenRuntime, ResetNvramEntry, OpenCanopy (B15)
-- SSDT-PLUG-ALT: 8-core (5825U), rest ACPI from B15
+- ACPI: includes SSDT-CPUR + CPUR table deletion for the Ryzen 7 5825U
 - RealtekBluetoothFirmware Info.plist: personality 0bda:c821
+- NootedRed 0.9.0 RELEASE, CI commit 490373b

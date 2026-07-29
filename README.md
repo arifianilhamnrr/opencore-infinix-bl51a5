@@ -1,379 +1,202 @@
-# OpenCore EFI — Infinix XBOOK 15 (BL51A5)
+# OpenCore EFI — Infinix XBOOK 15 BL51A5
 
-OpenCore config untuk **Infinix BL51A5**, dengan referensi:
+OpenCore EFI untuk **Infinix XBOOK 15 BL51A5** dengan AMD Ryzen 7 5825U dan iGPU Radeon Vega 8.
 
-| Repo | Dipakai untuk |
-|------|----------------|
-| [opencore-infinix-xbook-b15](https://github.com/kodeaqua/opencore-infinix-xbook-b15) | Chassis Infinix XBOOK (**Ryzen 5**) — base config, ACPI, touchpad, USB, audio |
-| [opencore-axioo-hype7-amd-x7-2](https://github.com/kodeaqua/opencore-axioo-hype7-amd-x7-2) | CPU/wireless AMD (**Ryzen 7 5825U**) — kernel patch, `rtw88`, Realtek BT |
+Snapshot ini diekspor dari EFI yang dipakai harian pada **29 Juli 2026**. Semua identitas SMBIOS di repo sudah diganti dengan placeholder.
 
-Wi-Fi UI: [Starskiff](https://github.com/thegwchr/Starskiff) · Driver: [Feixiao `rtw88`](https://github.com/thegwchr/Feixiao) · BT: [RealtekBluetoothFirmware](https://github.com/thegwchr/RealtekBluetoothFirmware)
+## Dukungan macOS
 
-> **SMBIOS di repo = placeholder** — wajib diganti sendiri sebelum dipakai (lihat `SMBIOS.txt`).
-> **Laporan uji di BL51A5:** macOS Sequoia **15.7** — recovery, UnPlugged offline install, desktop, Wi-Fi (Starskiff), Ethernet, fix NootedRed.  
-> Recovery default: **Sequoia**. Backup Sonoma: tag `sonoma-recovery-working`.
+| Versi | Status | Catatan |
+|---|---|---|
+| macOS Tahoe 26.5 | ✅ Diuji langsung | Sistem utama saat snapshot dibuat |
+| macOS Sequoia 15.7 | ✅ Pernah diuji | ACPI, kernel patch, dan susunan kext yang sama; lakukan backup sebelum berpindah versi |
+| Sonoma dan lebih lama | ⚠️ Tidak menjadi target snapshot | Mungkin bisa boot, tetapi tidak diuji dengan config ini |
 
----
+Config OpenCore ini tidak dikunci khusus ke Tahoe. Kernel patch AMD, ACPI, dan kext utamanya dapat dipakai di **Tahoe maupun Sequoia**. Namun, update macOS atau kext tetap dapat mengubah kompatibilitas.
 
-## Hardware target
+## Hardware
 
 | Komponen | Detail |
-|----------|--------|
-| Model | Infinix **BL51A5** (XBOOK15) |
-| Board | `EM_AB336_MB_CY_V1.0` |
-| BIOS | `BL51A5_AB336_XBOOK15_V1.10` |
-| CPU | AMD **Ryzen 7 5825U** (8C/16T, Zen 3 / Cezanne) |
-| iGPU | AMD Radeon **Barcelo** (`1002:15e7`) |
-| Wi-Fi | Realtek **RTL8821CE** PCIe (`10ec:c821`) |
-| Bluetooth | Realtek USB **`0bda:c821`** (HCI 4.2 / RTL8821C) |
-| Ethernet | Realtek **RTL8111/8168** (`10ec:8168`) |
-| Audio | Realtek **ALC269VC** (`10ec:0269`) |
-| Trackpad | I2C HID `36B6:C001` (`PNP0C50`) |
-| Storage | NVMe |
-| SMBIOS | **MacBookPro16,2** (disarankan NootedRed; isi sendiri) |
+|---|---|
+| Model | Infinix XBOOK 15 / BL51A5 |
+| Motherboard | `EM_AB336_MB_CY_V1.0` |
+| BIOS teruji | `BL51A5_AB336_XBOOK15_V1.10` |
+| CPU | AMD Ryzen 7 5825U, 8 core / 16 thread |
+| iGPU | AMD Radeon Vega 8 / Barcelo, `1002:15e7` |
+| RAM saat pengujian | 8 GB DDR4-3200, single-channel |
+| Storage | NVMe SSD |
+| Wi-Fi | Realtek RTL8821CE PCIe, `10ec:c821` |
+| Bluetooth | Realtek RTL8821C USB, `0bda:c821` |
+| Ethernet | Realtek RTL8111/8168 |
+| Audio | Realtek ALC269VC, layout-id 55 |
+| Trackpad | I2C HID melalui VoodooI2C/VoodooI2CHID |
+| SMBIOS | MacBookPro16,2 |
 
----
+## Status fitur
 
-## Perbedaan dengan referensi
+| Fitur | Status | Catatan |
+|---|---|---|
+| OpenCore picker dan boot macOS | ✅ Bekerja | Tahoe 26.5 diuji sebagai sistem utama |
+| CPU 8C/16T | ✅ Bekerja | Kernel patch AMD + ForgedInvariant |
+| CPU power management | ✅ Bekerja | AMDRyzenCPUPowerManagement, SMCAMDProcessor, dan SSDT-CPUR |
+| iGPU Vega 8 + Metal | ⚠️ Bekerja dengan batasan | NootedRed memberi akselerasi, tetapi beban video/Metal tertentu masih dapat memicu GPU reset |
+| Internal display | ✅ Bekerja | Termasuk backlight |
+| Keyboard | ✅ Bekerja | VoodooPS2Controller |
+| Trackpad I2C | ✅ Bekerja | VoodooI2C + VoodooI2CHID; gesture tertentu dapat berbeda |
+| Brightness keys | ✅ Bekerja | BrightnessKeys |
+| Battery status | ✅ Bekerja | SMCBatteryManager |
+| NVMe | ✅ Bekerja | NVMeFix aktif |
+| Ethernet | ✅ Driver aktif | RealtekRTL8111 |
+| Wi-Fi RTL8821CE | ✅ Bekerja lewat Starskiff | Tidak tampil sebagai AirPort/CoreWLAN native |
+| Wi-Fi lewat System Settings | ❌ Tidak bekerja | `rtw88` memublikasikan interface Ethernet; gunakan Starskiff |
+| Bluetooth Realtek | ⚠️ Parsial | Firmware dan BlueToolFixup dimuat, tetapi controller tidak selalu tampil normal di System Settings |
+| AirDrop / AWDL / Continuity penuh | ❌ Tidak bekerja | RTL8821CE bukan kartu AirPort dan driver tidak menyediakan AWDL |
+| Audio | ✅ Bekerja | AppleALC setelah NootedRed, layout-id 55 |
+| Sleep/wake | ⚠️ Belum dijamin | Uji sendiri; USB mapping dan Bluetooth dapat memengaruhi wake |
+| DRM / streaming protected content | ⚠️ Tidak dijamin | `unfairgva=1` sengaja dihapus karena tidak memperbaiki reset GPU |
 
-**BL51A5 dan [B15](https://github.com/kodeaqua/opencore-infinix-xbook-b15) = laptop/chassis Infinix XBOOK yang sama.** Bedanya cuma CPU: B15 pakai **Ryzen 5**, BL51A5 pakai **Ryzen 7 5825U** (setara kelas [Axioo Hype 7](https://github.com/kodeaqua/opencore-axioo-hype7-amd-x7-2)).
+## Batasan grafis NootedRed
 
-| Aspek | Sumber | Catatan |
-|-------|--------|---------|
-| Config, OpenCore, drivers, kexts, ACPI, touchpad, USB, audio, Ethernet | **B15** | Ikut mesin Infinix — tidak diambil dari Axioo |
-| Kernel patch (8-core), `rtw88`, Realtek BT | **Axioo** | Ganti bagian CPU + wireless; Brcm/HoRNDIS B15 tidak dipakai |
-| `SSDT-PLUG` | **Axioo** (8-core) | Satu-satunya ACPI yang disesuaikan untuk Ryzen 7 |
-| `boot-args` | `unfairgva=1` | Tambah `-v` saat recovery/debug. Argumen Axioo (`npci`, `revpatch`, dll.) coba **satu per satu** — sekaligus dilaporkan boot hang |
-| SMBIOS | **MacBookPro16,2** | Placeholder di repo — generate sendiri (`SMBIOS.txt`) |
+EFI ini memakai **NootedRed 0.9.0 RELEASE**, commit `490373b`. Versi tersebut terasa lebih baik daripada 0.8.10 pada unit pengujian, tetapi belum menghilangkan semua masalah.
 
-**Tetap dari B15 (chassis sama):** VoodooI2C/HID touchpad, SSDT USB Infinix, `AppleALC` layout 55, `RealtekRTL8111` v3.0.0, tanpa `USBToolBox`/`UTBMap` Axioo.
+Gejala yang pernah terkonfirmasi melalui laporan `.gpuRestart`:
 
----
+- Safari/WebKit dapat tersendat atau reset saat memutar video.
+- App Store dan `mediaanalysisd` juga dapat memicu reset pada shader `VTMTSComputeFunction`.
+- Aplikasi Chromium/Electron seperti Discord, Spotify, Termius, dan Brave dapat lag saat hardware acceleration aktif.
+- Menambah UMA dari 512 MB ke 1 GB membantu ruang grafis, tetapi tidak menyelesaikan bug driver.
 
-## Isi folder
+Workaround harian:
 
-```
-opencore-infinix-bl51a5/
-├── EFI/OC/                 # bootloader
-│   ├── ACPI/
-│   ├── Drivers/
-│   ├── Kexts/
-│   ├── Resources/
-│   ├── Config.plist
-│   └── OpenCore.efi
-├── Extras/
-│   ├── Starskiff-v1.0.0.dmg   # UI Wi-Fi (post-install)
-│   └── fix-nootedred.sh       # mandatory NootedRed fix (Recovery / post-install)
-└── README.md
-```
+- Jalankan aplikasi Electron bermasalah dengan `--disable-gpu`.
+- Matikan graphics acceleration pada browser jika stabilitas lebih penting.
+- Gunakan wallpaper solid bila wallpaper dinamis memicu reset.
+- Jalankan `Extras/fix-nootedred.sh` setelah fresh install jika desktop/login mengalami hang.
+- UMA 1 GB cukup seimbang untuk RAM 8 GB. Jika sudah 16 GB dual-channel, UMA 2 GB dapat dicoba.
 
-### Stack wireless (penting)
-
-| Role | Kext / app |
-|------|------------|
-| Wi-Fi driver | `rtw88.kext` (Feixiao) |
-| Wi-Fi UI | **Starskiff.app** (bukan System Settings native) |
-| BT firmware | `RealtekBluetoothFirmware.kext` |
-| BT Monterey+ | `BlueToolFixup.kext` |
-| Dependency | `Lilu.kext` |
-
----
-
-## BIOS (wajib)
-
-Sama seperti [B15](https://github.com/kodeaqua/opencore-infinix-xbook-b15) — opsi berikut **ada semua** di BIOS Infinix XBOOK (BL51A5 / BL15A5). Update BIOS ke versi terbaru dulu.
-
-| Setting | Nilai |
-|---------|--------|
-| Secure Boot | **Disabled** |
-| Fast Boot | **Disabled** |
-| CSM | **Disabled** |
-| IOMMU | **Disabled** |
-| Above 4G Decoding | **Enabled** |
-| UMA / GPU VRAM | **Game Optimized** |
-
-**Jangan** ubah menu engineer/advanced BIOS (risiko brick — ada laporan motherboard replace dari service center di B15).
-
----
-
-## Install singkat
-
-### 1) SMBIOS (wajib — isi sendiri)
-
-`Config.plist` → `PlatformInfo` → `Generic` berisi **placeholder**:
-
-| Field | Nilai di repo | Yang harus kamu lakukan |
-|-------|---------------|-------------------------|
-| `SystemProductName` | `MacBookPro16,2` | Bisa tetap (cocok NootedRed laptop AMD) |
-| `SystemSerialNumber` | `XXXXXXXXXXXX` | Generate unik per mesin |
-| `MLB` | `M0000000000000001` | Generate unik per mesin |
-| `SystemUUID` | `00000000-0000-0000-0000-000000000000` | `uuidgen` → UUID baru |
-| `ROM` | placeholder (`ESIzRFVm`) | Ganti dengan MAC Wi‑Fi internal (6 byte, base64) |
-
-```bash
-# Serial + MLB
-macserial -m MacBookPro16,2
-# Cek valid/invalid: https://checkcoverage.apple.com
-
-# UUID
-uuidgen
-
-# ROM dari MAC Wi-Fi (contoh aa:bb:cc:dd:ee:ff)
-echo -n "aabbccddeeff" | xxd -r -p | base64
-# Paste hasil base64 ke Config.plist → PlatformInfo → Generic → ROM (type data)
-```
-
-Detail dan contoh: `SMBIOS.txt`.
-
-**Penting:** Jangan pakai SMBIOS orang lain dari repo/GitHub. Satu serial = satu mesin (iMessage, iCloud, Apple ID).
-
-### 2) Install macOS Sequoia
-
-**Opsi A — USB installer**
-
-1. Buat USB install macOS Sequoia.
-2. Mount EFI USB, copy folder `EFI/` ke root EFI partition.
-3. Boot USB lewat OpenCore picker.
-4. Install ke internal disk — jangan timpa partisi/OS yang sudah ada tanpa backup.
-
-**Opsi B — UnPlugged offline**
-
-1. Siapkan partisi exFAT ~20GB (`InstallPayload`) berisi `InstallAssistant.pkg`, `UnPlugged.command`, `BaseSystem.dmg`, `fix-nootedred.sh`.
-2. Boot OpenCore → Sequoia Recovery.
-3. Erase APFS partition → `Macintosh HD`.
-4. Mount exFAT manual (`mount_exfat`) — Sequoia recovery **tidak** auto-mount exFAT.
-5. `bash UnPlugged.command` → install offline ke `Macintosh HD`.
-6. **Sebelum boot desktop:** jalankan `fix-nootedred.sh` (lihat **A. NootedRed** di post-install).
-
-### 3) Copy EFI ke internal
-
-Setelah install, mount EFI internal, copy `EFI/` yang sama (dengan SMBIOS yang sudah diganti).
-
-### 4) Post-install (mandatory — tested Sequoia 15.7)
-
-#### Contoh layout disk (dual-boot)
-
-Sesuaikan dengan disk kamu. Contoh yang dipakai saat pengujian:
-
-| Partisi | Peran |
-|---------|--------|
-| EFI kecil (FAT32) | OpenCore + opsional `com.apple.recovery.boot` |
-| APFS besar | Target macOS (`Macintosh HD`) |
-| exFAT ~20GB (opsional) | Offline installer + `fix-nootedred.sh` + Starskiff |
-| Partisi OS lain | OS yang sudah terpasang — jangan timpa tanpa backup |
-
-Copy `Extras/fix-nootedred.sh` dan `Extras/Starskiff-v1.0.0.dmg` ke partisi exFAT agar bisa di-mount dari Recovery (Sequoia tidak auto-mount exFAT).
-
----
-
-#### A. NootedRed — gray screen, About, wallpaper (WAJIB tiap fresh install)
-
-Bug NootedRed di Sonoma/Sequoia: GPU compute hang (wallpaper decode, login, System Settings → About).
-
-**Workaround resmi:** [NootedRed #235](https://github.com/ChefKissInc/NootedRed/issues/235#issuecomment-4567109847) · [discussion #430](https://github.com/ChefKissInc/NootedRed/discussions/430)
-
-**Dari Recovery** (setelah install / reinstall, sebelum boot desktop):
-
-```bash
-# Mount InstallPayload (Sequoia+ tidak auto-mount exFAT)
-diskutil list physical
-mkdir -p /Volumes/UnPlugged
-/sbin/mount_exfat /dev/disk0s3 /Volumes/UnPlugged   # sesuaikan disk0s3
-
-bash /Volumes/UnPlugged/fix-nootedred.sh "Macintosh HD"
-reboot
-```
-
-Atau manual:
-
-```bash
-defaults write "/Volumes/Macintosh HD/Library/Preferences/com.apple.coremedia" allowMetalTransferSession -bool NO
-chmod 644 "/Volumes/Macintosh HD/Library/Preferences/com.apple.coremedia.plist"
-```
-
-**Alternatif dari OS lain** (mis. Linux dengan dual-boot) — tanpa Recovery, butuh modul `apfs` read-write:
-
-```bash
-sudo modprobe apfs
-sudo mount -t apfs -o vol=0 /dev/nvme0n1pX /mnt/macos   # sesuaikan partisi APFS
-sudo tee /mnt/macos/Library/Preferences/com.apple.coremedia.plist > /dev/null << 'EOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0"><dict><key>allowMetalTransferSession</key><false/></dict></plist>
-EOF
-sudo chmod 644 /mnt/macos/Library/Preferences/com.apple.coremedia.plist
-sudo umount /mnt/macos
-```
-
-**Wallpaper (penting — tested):**
-
-| Wallpaper | Hasil di NootedRed + Sequoia |
-|-----------|------------------------------|
-| **Color** (solid) | ✅ Aman — About tampil, boot normal |
-| **Pictures** / dynamic (`.mov`, Sequoia Sunrise, dll.) | ❌ `gpuRestart`, About hilang/crash setelah reboot |
-| Memoji avatar | ❌ Hindari |
-
-`fix-nootedred.sh` juga reset wallpaper user ke **Color**. Setelah fix, **jangan** ganti ke Pictures/dynamic.
-
----
-
-#### B. Wi-Fi — install Starskiff
-
-RTL8821CE bukan chip Apple — menu Wi-Fi native **tidak jalan**. Driver `rtw88.kext` sudah di EFI.
+Boot arguments snapshot ini:
 
 ```text
-Extras/Starskiff-v1.0.0.dmg  (atau dari /Volumes/UnPlugged/)
-→ drag Starskiff.app ke Applications
-→ System Settings → General → Login Items → Open at Login
-→ connect SSID lewat app Starskiff (bukan menu Wi-Fi Apple)
+revcpu=1 -NRedDPDelay
 ```
 
-Mount InstallPayload dari macOS desktop:
+`unfairgva=1` sudah dihapus setelah pengujian karena tidak memperbaiki masalah video dan GPU reset.
+
+## Wi-Fi dan Bluetooth
+
+RTL8821CE tidak dikenali sebagai Wi-Fi native oleh CoreWLAN. Driver `rtw88.kext` membuat interface `en0` bertipe Ethernet dan **Starskiff** berkomunikasi langsung dengan user-client driver.
+
+Komponen:
+
+| Peran | Komponen |
+|---|---|
+| Driver Wi-Fi | `rtw88.kext` |
+| UI Wi-Fi | Starskiff |
+| Firmware Bluetooth | `RealtekBluetoothFirmware.kext` |
+| Patch Bluetooth Monterey+ | `BlueToolFixup.kext` |
+
+Setelah instalasi:
+
+1. Install Starskiff dari `Extras/Starskiff-v1.0.0.dmg` atau gunakan rilis yang lebih baru.
+2. Tambahkan Starskiff ke **System Settings → General → Login Items**.
+3. Hubungkan Wi-Fi melalui ikon Starskiff, bukan menu Wi-Fi Apple.
+
+AirDrop tidak dapat diperbaiki hanya dengan mengubah config. Untuk AirDrop dibutuhkan hardware dan driver dengan dukungan AWDL.
+
+## BIOS
+
+Gunakan pengaturan berikut:
+
+| Setting | Nilai |
+|---|---|
+| Secure Boot | Disabled |
+| Fast Boot | Disabled |
+| CSM | Disabled |
+| IOMMU | Disabled |
+| Above 4G Decoding | Enabled |
+| UMA Frame Buffer | 1 GB untuk RAM 8 GB; coba 2 GB setelah upgrade ke 16 GB |
+
+Jangan mengubah menu engineer/advanced yang tidak dipahami. Backup setting BIOS dan EFI sebelum eksperimen.
+
+## Sebelum digunakan: buat SMBIOS sendiri
+
+Repo publik ini **tidak berisi identitas mesin asli**. Nilai berikut adalah placeholder:
+
+| Field | Placeholder |
+|---|---|
+| SystemSerialNumber | `XXXXXXXXXXXX` |
+| MLB | `M0000000000000001` |
+| SystemUUID | `00000000-0000-0000-0000-000000000000` |
+| ROM | `11:22:33:44:55:66` |
+
+Generate nilai unik menggunakan GenSMBIOS/macserial sebelum login ke iCloud. Jangan memakai serial dari repo orang lain dan jangan pernah commit identitas mesin pribadi.
+
+## Instalasi singkat
+
+1. Download atau clone repo ini.
+2. Generate SMBIOS unik dan isi `EFI/OC/config.plist`.
+3. Copy folder `EFI` ke partisi EFI USB untuk pengujian.
+4. Boot dari USB terlebih dahulu.
+5. Jika seluruh perangkat utama bekerja, backup EFI lama lalu copy EFI ini ke partisi internal.
+6. Reset NVRAM hanya ketika memang diperlukan setelah perubahan config besar.
+
+Untuk fresh install yang mengalami gray screen/hang, jalankan:
 
 ```bash
-sudo mkdir -p /Volumes/UnPlugged
-sudo /sbin/mount_exfat /dev/disk0s3 /Volumes/UnPlugged
-open /Volumes/UnPlugged/Starskiff-v1.0.0.dmg
+bash Extras/fix-nootedred.sh "Macintosh HD"
 ```
 
-Verifikasi driver:
+Sesuaikan nama volume target. Script sebaiknya dijalankan dari Recovery.
 
-```bash
-kextstat | grep -i rtw
+## Komponen utama snapshot
+
+| Komponen | Versi |
+|---|---|
+| NootedRed | 0.9.0 RELEASE (`490373b`) |
+| Lilu | 1.7.2 |
+| VirtualSMC | 1.3.7 |
+| AppleALC | 1.9.7 |
+| RestrictEvents | 1.1.6 |
+| RealtekRTL8111 | 3.0.4 |
+| rtw88 | 1.0.1 |
+| VoodooI2C | 2.9.1 |
+| VoodooPS2Controller | 2.3.7 |
+| AMDRyzenCPUPowerManagement | 0.7.2 |
+
+NootedRed harus dimuat **sebelum AppleALC**. Satu instance VoodooInput dari VoodooI2C digunakan; plugin VoodooInput, Mouse, dan Trackpad milik VoodooPS2 dinonaktifkan untuk menghindari konflik.
+
+## Struktur repo
+
+```text
+.
+├── EFI
+│   ├── BOOT
+│   └── OC
+│       ├── ACPI
+│       ├── Drivers
+│       ├── Kexts
+│       ├── Resources
+│       ├── config.plist
+│       └── OpenCore.efi
+├── Extras
+├── BACKUP.md
+├── SMBIOS.txt
+└── SOURCES.txt
 ```
 
----
+File backup/debug dari EFI harian sengaja tidak ikut dimasukkan.
 
-#### C. Ethernet
+## Sumber dan kredit
 
-`RealtekRTL8111.kext` **v3.0.0** sudah di EFI. Port biasanya **en1** (Wi-Fi Starskiff = en0).
-
-```bash
-kextstat | grep -i realtek
-networksetup -listallhardwareports
-sudo networksetup -setdhcp Ethernet
-```
-
----
-
-#### D. Bluetooth
-
-```bash
-log show --last boot --predicate 'eventMessage CONTAINS "RealtekFirmware"'
-```
-
-Harus kelihatan match chip + `firmware download complete`.
-
----
-
-#### E. Audio layout
-
-Default: `layout-id` **55** di DeviceProperties. Kalau speaker/mic salah, coba `alcid=` satu per satu (jangan batch dengan npci/revpatch):
-
-`11`, `13`, `28`, `33`, `55`, `66`, `99` — samakan dengan `DeviceProperties` → `layout-id`, reboot tiap percobaan.
-
----
-
-#### F. Boot-args lanjutan (hati-hati)
-
-Config default: `unfairgva=1` — **tested boot OK** di Sequoia.
-
-Referensi Axioo memakai `npci=0x3000 alcid=55 revpatch=auto,sbvmm` — di BL51A5 dilaporkan **boot hang** kalau dipasang sekaligus. Eksperimen **satu argumen per reboot**.
-
----
-
-#### G. USB
-
-Default mengikuti **B15**: SSDT power/reset saja, semua port native (tidak ada UTBMap Axioo).
-
-Kalau setelah stabil ingin map ketat: [USBToolBox](https://github.com/USBToolBox/tool) → map **khusus BL51A5**. BT (`0bda:c821`) & webcam (`1bcf:2864`) harus enabled.
-
----
-
-#### H. Lain
-
-```bash
-sudo systemsetup -settimezone <Your/Timezone>   # contoh: Asia/Jakarta
-```
-
----
-
-## Yang diharapkan jalan / tidak
-
-| Fitur | Ekspektasi |
-|-------|------------|
-| Boot + install | Ya (uji USB dulu) |
-| iGPU (NootedRed) | Ya, dengan post-install fix |
-| Keyboard / trackpad I2C | Ya (VoodooPS2 + VoodooI2C/HID) |
-| Ethernet | Ya (RTL8111) |
-| Wi-Fi 8821CE | Ya lewat Feixiao + Starskiff (non-Airport) |
-| Bluetooth 8821C | Ya lewat RealtekBluetoothFirmware (+ map USB) |
-| Audio ALC269VC | Ya dengan layout tuning |
-| Battery / sleep | Biasanya ok; perlu fine-tune |
-| Continuity / AirDrop native | **Jangan harap penuh** (Realtek non-native) |
-| Touchpad perfect | Bisa flaky (sama referensi Axioo) |
-
----
-
-## Kext order (sudah di-set)
-
-```
-Lilu
-VirtualSMC → AMDRyzenCPUPowerManagement → SMCAMDProcessor → sensors/battery
-NootedRed
-AppleALC
-RealtekRTL8111
-rtw88
-BlueToolFixup → RealtekBluetoothFirmware
-VoodooPS2Controller (+ Keyboard, Mouse, Trackpad; Input OFF)
-VoodooI2C (+ GPIO, Services, Input) → VoodooI2CHID → VoodooSMBus   # B15 style
-NVMeFix, RestrictEvents, ECEnabler, BrightnessKeys, ...
-```
-
----
-
-## Troubleshooting cepat
-
-| Gejala | Fix (tested Sequoia) |
-|--------|----------------------|
-| Gray screen + beachball (first boot) | Jalankan `Extras/fix-nootedred.sh` dari Recovery — **wajib tiap reinstall** |
-| About This Mac / System Settings → About hilang | Sama: NootedRed fix + wallpaper **Color** saja (bukan Pictures/dynamic) |
-| About hilang setelah ganti wallpaper + reboot | Reset ke Color: `fix-nootedred.sh` atau hapus `SystemWallpaperURL` di `com.apple.wallpaper.plist` |
-| Boot hang setelah ubah boot-args | Revert ke `unfairgva=1` saja → **Reset NVRAM** di OpenCore picker → boot lagi |
-| Wi-Fi kosong di Starskiff | `kextstat \| grep rtw`; boot lewat OpenCore (bukan direct) |
-| Ethernet no IP | Cek **en1** (bukan en0); `networksetup -setdhcp Ethernet` |
-| BT hilang | Log `RealtekFirmware`; personality `0bda:c821` |
-| No audio | Ganti `layout-id` / `alcid` satu per satu |
-| KP sleep | Disable SMCLightSensor sementara; cek USB map |
-
-Verbose boot: OpenCore picker → `Space` → verbose, atau tambah `-v` di boot-args sementara (recovery only).
-
----
-
-## Dual-boot
-
-- Backup EFI (`efibootmgr -v` / copy folder EFI) sebelum mengubah partisi.
-- OpenCore bisa di partisi EFI terpisah atau digabung — jangan timpa bootloader OS lain tanpa cadangan.
-- Jangan hapus EFI bootloader OS lain secara sembarangan.
-
----
+- [OpenCorePkg](https://github.com/acidanthera/OpenCorePkg)
+- [NootedRed](https://github.com/ChefKissInc/NootedRed)
+- [AMD Vanilla](https://github.com/AMD-OSX/AMD_Vanilla)
+- [VoodooI2C](https://github.com/VoodooI2C/VoodooI2C)
+- [OpenCore EFI Infinix XBOOK B15](https://github.com/kodeaqua/opencore-infinix-xbook-b15)
+- [OpenCore EFI Axioo Hype 7 AMD](https://github.com/kodeaqua/opencore-axioo-hype7-amd-x7-2)
+- FeiXiao/rtw88, Starskiff, dan RealtekBluetoothFirmware
+- Acidanthera, ChefKissInc, AMD-OSX, Mieze, dan komunitas Hackintosh
 
 ## Disclaimer
 
-- Hackintosh = risiko data loss, update macOS bisa break, BIOS salah setting bisa brick.
-- Repo ini **template/config** — bukan dukungan resmi Apple.
-- Kext pihak ketiga (Feixiao, RealtekBT, NootedRed, dll.) bersifat experimental.
-- **SMBIOS placeholder wajib diganti** sebelum dipakai. Jangan commit/publish serial asli kamu ke repo publik.
-
----
-
-## Credits
-
-- Acidanthera (OpenCore, Lilu, VirtualSMC, AppleALC, …)
-- ChefKissInc / NootedRed
-- AMD-OSX / algrey patches
-- kodeaqua (Axioo Hype 7 + Infinix B15 EFI)
-- thegwchr (Feixiao, Starskiff, RealtekBluetoothFirmware)
-- Mieze (RealtekRTL8111)
-- VoodooI2C team
-- Dortania OpenCore Install Guide
+Hackintosh tidak didukung Apple. Update macOS, BIOS, OpenCore, atau kext dapat menyebabkan gagal boot, kernel panic, kehilangan akselerasi, atau kehilangan data. Selalu simpan EFI bootable cadangan dan backup data sebelum melakukan perubahan.
