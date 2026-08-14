@@ -182,7 +182,6 @@ NootedRed harus dimuat **sebelum AppleALC**. Satu instance VoodooInput dari Vood
 │       ├── config.plist
 │       └── OpenCore.efi
 ├── Extras
-├── BACKUP.md
 ├── SMBIOS.txt
 └── SOURCES.txt
 ```
@@ -195,8 +194,6 @@ File backup/debug dari EFI harian sengaja tidak ikut dimasukkan.
 - [NootedRed](https://github.com/ChefKissInc/NootedRed)
 - [AMD Vanilla](https://github.com/AMD-OSX/AMD_Vanilla)
 - [VoodooI2C](https://github.com/VoodooI2C/VoodooI2C)
-- [OpenCore EFI Infinix XBOOK B15](https://github.com/kodeaqua/opencore-infinix-xbook-b15)
-- [OpenCore EFI Axioo Hype 7 AMD](https://github.com/kodeaqua/opencore-axioo-hype7-amd-x7-2)
 - FeiXiao/rtw88, Starskiff, dan RealtekBluetoothFirmware
 - Acidanthera, ChefKissInc, AMD-OSX, Mieze, dan komunitas Hackintosh
 

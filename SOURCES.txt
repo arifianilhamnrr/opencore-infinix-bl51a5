@@ -1,22 +1,16 @@
-Updated: 2026-07-29 from the working EFI on Infinix BL51A5
+Updated: 2026-08-14 from the stable daily EFI on Infinix BL51A5
 Tested profile: BL51A5 + macOS Tahoe 26.5 (direct) and Sequoia 15.7 (previous)
-Recovery: Sequoia BaseSystem.dmg on OC-ESP (tag sonoma-recovery-working = Sonoma backup)
-
-Original base (config, drivers, kexts, ACPI):
-  https://github.com/kodeaqua/opencore-infinix-xbook-b15
-
-CPU + wireless only (8-core patches, rtw88, Realtek BT):
-  https://github.com/kodeaqua/opencore-axioo-hype7-amd-x7-2
+Recovery: Sequoia BaseSystem.dmg on OC-ESP
 
 Wi-Fi UI post-install: Starskiff v1.0.0 (Extras/)
 NootedRed fix script: Extras/fix-nootedred.sh
 
 Local edits:
-- Config: working Tahoe snapshot + Axioo 8-core kernel patches + Realtek BT/Wi-Fi (no Brcm/HoRNDIS)
+- Config: stable Tahoe snapshot + AMD 8-core kernel patches + Realtek BT/Wi-Fi (no Brcm/HoRNDIS)
 - SMBIOS: MacBookPro16,2 PLACEHOLDERS — user must generate (see SMBIOS.txt)
 - boot-args default: revcpu=1 -NRedDPDelay
 - RealtekRTL8111.kext v3.0.4 — enableEEE=false, fallback MAC anonymized
-- Drivers: OpenHfsPlus, OpenRuntime, ResetNvramEntry, OpenCanopy (B15)
+- Drivers: OpenHfsPlus, OpenRuntime, ResetNvramEntry, OpenCanopy
 - ACPI: includes SSDT-CPUR + CPUR table deletion for the Ryzen 7 5825U
 - RealtekBluetoothFirmware Info.plist: personality 0bda:c821
-- NootedRed 0.9.0 RELEASE, CI commit 490373b
+- NootedRed 0.9.0 RELEASE artifact, build 2026-08-01 with macOS 26.5 SDK

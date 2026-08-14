@@ -516,7 +516,7 @@
 				<key>BundlePath</key>
 				<string>NootedRed.kext</string>
 				<key>Comment</key>
-				<string>NootedRed 0.9.0 RELEASE (master 490373b) - AMD iGPU (BEFORE AppleALC)</string>
+				<string>NootedRed 0.9.0 RELEASE artifact - AMD iGPU (BEFORE AppleALC)</string>
 				<key>Enabled</key>
 				<true/>
 				<key>ExecutablePath</key>
