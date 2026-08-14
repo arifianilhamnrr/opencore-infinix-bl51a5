@@ -2,7 +2,9 @@
 
 OpenCore EFI untuk **Infinix XBOOK 15 BL51A5** dengan AMD Ryzen 7 5825U dan iGPU Radeon Vega 8.
 
-Snapshot ini diekspor dari EFI yang dipakai harian pada **29 Juli 2026**. Semua identitas SMBIOS di repo sudah diganti dengan placeholder.
+Snapshot ini diekspor dari EFI yang dipakai harian pada **14 Agustus 2026**. Konfigurasi ini stabil untuk penggunaan harian pada macOS Tahoe 26.5; keterbatasan yang masih terasa terutama berupa artifact sesekali pada aplikasi Electron/Chromium. Semua identitas SMBIOS di repo sudah diganti dengan placeholder.
+
+![macOS Tahoe 26.5 berjalan pada Infinix XBOOK 15 BL51A5](docs/images/tahoe-26.5-about.png)
 
 ## Dukungan macOS
 
@@ -23,7 +25,7 @@ Config OpenCore ini tidak dikunci khusus ke Tahoe. Kernel patch AMD, ACPI, dan k
 | BIOS teruji | `BL51A5_AB336_XBOOK15_V1.10` |
 | CPU | AMD Ryzen 7 5825U, 8 core / 16 thread |
 | iGPU | AMD Radeon Vega 8 / Barcelo, `1002:15e7` |
-| RAM saat pengujian | 8 GB DDR4-3200, single-channel |
+| RAM saat pengujian | 16 GB DDR4-3200 |
 | Storage | NVMe SSD |
 | Wi-Fi | Realtek RTL8821CE PCIe, `10ec:c821` |
 | Bluetooth | Realtek RTL8821C USB, `0bda:c821` |
@@ -39,7 +41,7 @@ Config OpenCore ini tidak dikunci khusus ke Tahoe. Kernel patch AMD, ACPI, dan k
 | OpenCore picker dan boot macOS | ✅ Bekerja | Tahoe 26.5 diuji sebagai sistem utama |
 | CPU 8C/16T | ✅ Bekerja | Kernel patch AMD + ForgedInvariant |
 | CPU power management | ✅ Bekerja | AMDRyzenCPUPowerManagement, SMCAMDProcessor, dan SSDT-CPUR |
-| iGPU Vega 8 + Metal | ⚠️ Bekerja dengan batasan | NootedRed memberi akselerasi, tetapi beban video/Metal tertentu masih dapat memicu GPU reset |
+| iGPU Vega 8 + Metal | ✅ Stabil untuk penggunaan harian | NootedRed memberi akselerasi; artifact sesekali masih dapat muncul pada aplikasi Electron/Chromium |
 | Internal display | ✅ Bekerja | Termasuk backlight |
 | Keyboard | ✅ Bekerja | VoodooPS2Controller |
 | Trackpad I2C | ✅ Bekerja | VoodooI2C + VoodooI2CHID; gesture tertentu dapat berbeda |
@@ -49,22 +51,23 @@ Config OpenCore ini tidak dikunci khusus ke Tahoe. Kernel patch AMD, ACPI, dan k
 | Ethernet | ✅ Driver aktif | RealtekRTL8111 |
 | Wi-Fi RTL8821CE | ✅ Bekerja lewat Starskiff | Tidak tampil sebagai AirPort/CoreWLAN native |
 | Wi-Fi lewat System Settings | ❌ Tidak bekerja | `rtw88` memublikasikan interface Ethernet; gunakan Starskiff |
-| Bluetooth Realtek | ⚠️ Parsial | Firmware dan BlueToolFixup dimuat, tetapi controller tidak selalu tampil normal di System Settings |
+| Bluetooth Realtek | ✅ Bekerja pada unit pengujian | RealtekBluetoothFirmware + BlueToolFixup |
 | AirDrop / AWDL / Continuity penuh | ❌ Tidak bekerja | RTL8821CE bukan kartu AirPort dan driver tidak menyediakan AWDL |
 | Audio | ✅ Bekerja | AppleALC setelah NootedRed, layout-id 55 |
-| Sleep/wake | ⚠️ Belum dijamin | Uji sendiri; USB mapping dan Bluetooth dapat memengaruhi wake |
+| Sleep/wake | ✅ Bekerja pada unit pengujian | Tetap uji setelah mengubah USB mapping, Bluetooth, atau versi macOS |
 | DRM / streaming protected content | ⚠️ Tidak dijamin | `unfairgva=1` sengaja dihapus karena tidak memperbaiki reset GPU |
 
 ## Batasan grafis NootedRed
 
-EFI ini memakai **NootedRed 0.9.0 RELEASE**, commit `490373b`. Versi tersebut terasa lebih baik daripada 0.8.10 pada unit pengujian, tetapi belum menghilangkan semua masalah.
+EFI ini memakai **NootedRed 0.9.0 RELEASE artifact** yang dibangun pada 1 Agustus 2026 dengan macOS 26.5 SDK. Binary ini sama dengan yang dipakai pada snapshot stabil 14 Agustus 2026 dan terasa lebih baik daripada 0.8.10 pada unit pengujian, tetapi belum menghilangkan semua masalah grafis.
 
-Gejala yang pernah terkonfirmasi melalui laporan `.gpuRestart`:
+Gejala pada build sebelumnya yang pernah terkonfirmasi melalui laporan `.gpuRestart`:
 
 - Safari/WebKit dapat tersendat atau reset saat memutar video.
 - App Store dan `mediaanalysisd` juga dapat memicu reset pada shader `VTMTSComputeFunction`.
-- Aplikasi Chromium/Electron seperti Discord, Spotify, Termius, dan Brave dapat lag saat hardware acceleration aktif.
 - Menambah UMA dari 512 MB ke 1 GB membantu ruang grafis, tetapi tidak menyelesaikan bug driver.
+
+Pada snapshot saat ini, Safari, App Store, dan fungsi harian lain berjalan stabil pada unit pengujian. Masalah tersisa yang terlihat adalah artifact sesekali pada aplikasi Chromium/Electron seperti Discord, Spotify, Termius, dan Brave ketika hardware acceleration aktif.
 
 Workaround harian:
 
@@ -72,7 +75,7 @@ Workaround harian:
 - Matikan graphics acceleration pada browser jika stabilitas lebih penting.
 - Gunakan wallpaper solid bila wallpaper dinamis memicu reset.
 - Jalankan `Extras/fix-nootedred.sh` setelah fresh install jika desktop/login mengalami hang.
-- UMA 1 GB cukup seimbang untuk RAM 8 GB. Jika sudah 16 GB dual-channel, UMA 2 GB dapat dicoba.
+- Dengan RAM 16 GB, UMA 2 GB dapat dicoba. Gunakan 1 GB bila ingin menyisakan lebih banyak RAM untuk sistem.
 
 Boot arguments snapshot ini:
 
@@ -114,7 +117,7 @@ Gunakan pengaturan berikut:
 | CSM | Disabled |
 | IOMMU | Disabled |
 | Above 4G Decoding | Enabled |
-| UMA Frame Buffer | 1 GB untuk RAM 8 GB; coba 2 GB setelah upgrade ke 16 GB |
+| UMA Frame Buffer | 1 GB atau 2 GB untuk RAM 16 GB; snapshot diuji dengan 2 GB |
 
 Jangan mengubah menu engineer/advanced yang tidak dipahami. Backup setting BIOS dan EFI sebelum eksperimen.
 
@@ -152,7 +155,7 @@ Sesuaikan nama volume target. Script sebaiknya dijalankan dari Recovery.
 
 | Komponen | Versi |
 |---|---|
-| NootedRed | 0.9.0 RELEASE (`490373b`) |
+| NootedRed | 0.9.0 RELEASE artifact, build 1 Agustus 2026 (macOS 26.5 SDK) |
 | Lilu | 1.7.2 |
 | VirtualSMC | 1.3.7 |
 | AppleALC | 1.9.7 |
