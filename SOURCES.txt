@@ -1,16 +1,17 @@
-Updated: 2026-08-14 from the stable daily EFI on Infinix BL51A5
-Tested profile: BL51A5 + macOS Tahoe 26.5 (direct) and Sequoia 15.7 (previous)
+Updated: 2026-09-22 from the active EFI on Infinix BL51A5
+Tested profile: BL51A5 + macOS Sonoma 14.8.9 (direct); Tahoe 26.5 and Sequoia 15.7 (previous)
 Recovery: Sequoia BaseSystem.dmg on OC-ESP
 
-Wi-Fi UI post-install: Starskiff v1.0.0 (Extras/)
+Wi-Fi: AirPort_RTW88 1.0.3 + Sonoma Legacy IO80211 stack; FeiXiao rtw88 + Starskiff kept disabled as fallback
 NootedRed fix script: Extras/fix-nootedred.sh
 
 Local edits:
-- Config: stable Tahoe snapshot + AMD 8-core kernel patches + Realtek BT/Wi-Fi (no Brcm/HoRNDIS)
+- Config: Sonoma snapshot + AMD 8-core kernel patches + Realtek BT/Wi-Fi
 - SMBIOS: MacBookPro16,2 PLACEHOLDERS — user must generate (see SMBIOS.txt)
 - boot-args default: revcpu=1 -NRedDPDelay
-- RealtekRTL8111.kext v3.0.4 — enableEEE=false, fallback MAC anonymized
+- RealtekRTL8111.kext v3.0.0 — active Sonoma snapshot
 - Drivers: OpenHfsPlus, OpenRuntime, ResetNvramEntry, OpenCanopy
 - ACPI: includes SSDT-CPUR + CPUR table deletion for the Ryzen 7 5825U
 - RealtekBluetoothFirmware Info.plist: personality 0bda:c821
-- NootedRed 0.9.0 RELEASE artifact, build 2026-08-01 with macOS 26.5 SDK
+- NootedRed 0.8.10 — active Sonoma snapshot
+- AirPort_RTW88 1.0.3 known issue: intermittent data-path stall; Wi-Fi power-cycle has been followed by a kernel panic (upstream issue #4)

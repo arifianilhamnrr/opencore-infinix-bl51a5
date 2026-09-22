@@ -4,19 +4,19 @@
 
 OpenCore EFI for the **Infinix XBOOK 15 BL51A5**, powered by an AMD Ryzen 7 5825U and Radeon Vega 8 integrated graphics.
 
-This snapshot was exported from the daily-use EFI on **August 14, 2026**. It is stable for everyday use on macOS Tahoe 26.5; the main remaining limitation is occasional visual artifacting in Electron/Chromium applications. All SMBIOS identifiers in this public repository have been replaced with placeholders.
+This snapshot was exported from the active EFI on **September 22, 2026** and targets **macOS Sonoma 14.8.9 (23J631)**. All SMBIOS identifiers in this public repository have been replaced with placeholders.
 
-![macOS Tahoe 26.5 running on the Infinix XBOOK 15 BL51A5](docs/images/tahoe-26.5-about.png)
+![Earlier macOS Tahoe installation on the Infinix XBOOK 15 BL51A5](docs/images/tahoe-26.5-about.png)
 
 ## macOS support
 
 | Version | Status | Notes |
 |---|---|---|
-| macOS Tahoe 26.5 | ✅ Directly tested | Primary system when this snapshot was created |
-| macOS Sequoia 15.7 | ✅ Previously tested | Uses the same ACPI, kernel patches, and kext order; make a backup before switching versions |
-| Sonoma and older | ⚠️ Not a snapshot target | May boot, but has not been tested with this configuration |
+| macOS Sonoma 14.8.9 | ✅ Directly tested | Primary target of this snapshot |
+| macOS Tahoe 26.5 | ✅ Previously tested | Previous repository snapshot used FeiXiao `rtw88` + Starskiff |
+| macOS Sequoia 15.7 | ✅ Previously tested | Back up the EFI before switching versions |
 
-This OpenCore configuration is not locked specifically to Tahoe. Its AMD kernel patches, ACPI tables, and primary kexts can be used on both **Tahoe and Sequoia**. However, macOS and kext updates may still affect compatibility.
+This snapshot contains the Sonoma Legacy IO80211 stack for AirPort_RTW88. Do not assume that the same Wi-Fi configuration is suitable for newer macOS releases without testing from a USB EFI first.
 
 ## Hardware
 
@@ -40,10 +40,10 @@ This OpenCore configuration is not locked specifically to Tahoe. Its AMD kernel 
 
 | Feature | Status | Notes |
 |---|---|---|
-| OpenCore picker and macOS boot | ✅ Working | Tahoe 26.5 tested as the primary system |
+| OpenCore picker and macOS boot | ✅ Working | Sonoma 14.8.9 tested as the primary system |
 | CPU 8C/16T | ✅ Working | AMD kernel patches + ForgedInvariant |
 | CPU power management | ✅ Working | AMDRyzenCPUPowerManagement, SMCAMDProcessor, and SSDT-CPUR |
-| Vega 8 iGPU + Metal | ✅ Stable for daily use | NootedRed provides acceleration; occasional artifacts may still appear in Electron/Chromium applications |
+| Vega 8 iGPU + Metal | ⚠️ Working with limitations | NootedRed provides acceleration; GPU resets or artifacts may occur in some applications |
 | Internal display | ✅ Working | Includes backlight control |
 | Keyboard | ✅ Working | VoodooPS2Controller |
 | I2C trackpad | ✅ Working | VoodooI2C + VoodooI2CHID; individual gestures may vary |
@@ -51,17 +51,17 @@ This OpenCore configuration is not locked specifically to Tahoe. Its AMD kernel 
 | Battery status | ✅ Working | SMCBatteryManager |
 | NVMe | ✅ Working | NVMeFix enabled |
 | Ethernet | ✅ Driver active | RealtekRTL8111 |
-| RTL8821CE Wi-Fi | ✅ Working through Starskiff | Does not appear as native AirPort/CoreWLAN Wi-Fi |
-| Wi-Fi in System Settings | ❌ Not working | `rtw88` publishes an Ethernet-type interface; use Starskiff |
+| RTL8821CE Wi-Fi | ⚠️ Experimental | Native Wi-Fi UI through AirPort_RTW88 1.0.3; intermittent data-path stalls are known |
+| Wi-Fi recovery | ⚠️ Unreliable | Power-cycling Wi-Fi after a stall has triggered a kernel panic; see issue linked below |
 | Realtek Bluetooth | ✅ Working on the tested unit | RealtekBluetoothFirmware + BlueToolFixup |
-| Full AirDrop / AWDL / Continuity | ❌ Not working | RTL8821CE is not an AirPort card and its driver does not provide AWDL |
+| Full AirDrop / AWDL / Continuity | ❌ Not reliable | AirPort_RTW88 does not provide production-ready AWDL/Continuity support |
 | Audio | ✅ Working | AppleALC after NootedRed, layout-id 55 |
 | Sleep/wake | ✅ Working on the tested unit | Retest after changing the USB map, Bluetooth stack, or macOS version |
 | DRM / protected streaming content | ⚠️ Not guaranteed | `unfairgva=1` was intentionally removed because it did not prevent GPU resets |
 
 ## NootedRed graphics limitations
 
-This EFI uses a **NootedRed 0.9.0 RELEASE artifact** built on August 1, 2026 with the macOS 26.5 SDK. The binary is identical to the one used by the stable August 14 snapshot and performs better than 0.8.10 on the tested unit, but it does not eliminate every graphics issue.
+This EFI currently uses **NootedRed 0.8.10**, matching the active Sonoma EFI. Graphics acceleration works on the tested unit, but NootedRed limitations can still vary by macOS version and workload.
 
 Symptoms previously confirmed on older builds through `.gpuRestart` reports:
 
@@ -69,7 +69,7 @@ Symptoms previously confirmed on older builds through `.gpuRestart` reports:
 - App Store and `mediaanalysisd` could trigger resets in the `VTMTSComputeFunction` shader.
 - Increasing UMA from 512 MB to 1 GB provided more graphics memory but did not solve the driver bug.
 
-With the current snapshot, Safari, App Store, and other daily-use features are stable on the tested unit. The remaining observed issue is occasional artifacting in Chromium/Electron applications such as Discord, Spotify, Termius, and Brave while hardware acceleration is enabled.
+Graphics acceleration is available, but stability depends on the application and macOS build. GPU resets have previously been recorded, and Chromium/Electron applications such as Discord, Spotify, Termius, and Brave may show artifacts while hardware acceleration is enabled.
 
 Daily-use workarounds:
 
@@ -89,24 +89,21 @@ revcpu=1 -NRedDPDelay
 
 ## Wi-Fi and Bluetooth
 
-RTL8821CE is not recognized as native Wi-Fi by CoreWLAN. The `rtw88.kext` driver creates an Ethernet-type `en0` interface, while **Starskiff** communicates directly with the driver's user client.
+On Sonoma, this snapshot uses AirPort_RTW88 with the Legacy IO80211 stack so RTL8821CE appears in Apple's native Wi-Fi interface. The older FeiXiao `rtw88.kext` remains in the EFI as a disabled fallback and must not be enabled at the same time.
 
 Components:
 
 | Role | Component |
 |---|---|
-| Wi-Fi driver | `rtw88.kext` |
-| Wi-Fi UI | Starskiff |
+| Wi-Fi driver | `AirPort_RTW88.kext` 1.0.3 |
+| Compatibility stack | `AMFIPass.kext`, `IOSkywalkFamily.kext`, `IO80211FamilyLegacy.kext` |
+| Disabled fallback | FeiXiao `rtw88.kext` 1.0.1 + Starskiff |
 | Bluetooth firmware | `RealtekBluetoothFirmware.kext` |
 | Bluetooth patch for Monterey and newer | `BlueToolFixup.kext` |
 
-After installation:
+Known issue: the connection can remain visually associated while the data path stops passing traffic. A Wi-Fi off/on recovery has also been followed by a kernel stack-corruption panic in `airportd`/`apple80211_ioctl`. See [Airport_RTW88 issue #4](https://github.com/xnoah222/Airport_RTW88/issues/4). Keep Ethernet or another recovery path available and do not present this Wi-Fi setup as production-stable.
 
-1. Install Starskiff from `Extras/Starskiff-v1.0.0.dmg`, or use a newer release.
-2. Add Starskiff to **System Settings → General → Login Items**.
-3. Connect to Wi-Fi through the Starskiff menu-bar icon instead of Apple's Wi-Fi menu.
-
-AirDrop cannot be enabled through configuration changes alone. It requires hardware and a driver with AWDL support.
+AirDrop cannot be made reliable through configuration changes alone. It requires working AWDL support in both hardware and driver.
 
 ## BIOS
 
@@ -157,13 +154,17 @@ Adjust the target volume name as needed. The script should be run from Recovery.
 
 | Component | Version |
 |---|---|
-| NootedRed | 0.9.0 RELEASE artifact, August 1, 2026 build (macOS 26.5 SDK) |
+| NootedRed | 0.8.10 |
 | Lilu | 1.7.2 |
 | VirtualSMC | 1.3.7 |
 | AppleALC | 1.9.7 |
 | RestrictEvents | 1.1.6 |
-| RealtekRTL8111 | 3.0.4 |
-| rtw88 | 1.0.1 |
+| RealtekRTL8111 | 3.0.0 |
+| AirPort_RTW88 | 1.0.3 |
+| AMFIPass | 1.4.1 |
+| IO80211FamilyLegacy | 12.0 |
+| IOSkywalkFamily | 1.0 |
+| rtw88 fallback | 1.0.1 (disabled) |
 | VoodooI2C | 2.9.1 |
 | VoodooPS2Controller | 2.3.7 |
 | AMDRyzenCPUPowerManagement | 0.7.2 |
@@ -198,7 +199,7 @@ Backup and debug files from the daily EFI are intentionally excluded.
 - [NootedRed](https://github.com/ChefKissInc/NootedRed)
 - [AMD Vanilla](https://github.com/AMD-OSX/AMD_Vanilla)
 - [VoodooI2C](https://github.com/VoodooI2C/VoodooI2C)
-- FeiXiao/rtw88, Starskiff, and RealtekBluetoothFirmware
+- Airport_RTW88, FeiXiao/rtw88, Starskiff, and RealtekBluetoothFirmware
 - Acidanthera, ChefKissInc, AMD-OSX, Mieze, and the Hackintosh community
 
 ## Disclaimer

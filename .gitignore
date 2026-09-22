@@ -4,3 +4,11 @@
 .Spotlight-V100
 .Trashes
 Thumbs.db
+._*
+**/._*
+*.bak
+*.old
+*.orig
+*backup*
+*before-*
+*staging*

@@ -16,7 +16,10 @@
 			</dict>
 			<dict>
 				<key>Comment</key>
-				<string>Redefines modern CPU Devices as legacy Processor objects and sets plugin-type to 1 on the first</string>
+				<string>
+      Redefines modern CPU Devices as legacy Processor objects and sets
+      plugin-type to 1 on the first
+     </string>
 				<key>Enabled</key>
 				<true/>
 				<key>Path</key>
@@ -70,6 +73,14 @@
 				<key>Path</key>
 				<string>SSDT-PNLF.aml</string>
 			</dict>
+			<dict>
+				<key>Comment</key>
+				<string>Return the firmware-updated lid state to macOS</string>
+				<key>Enabled</key>
+				<true/>
+				<key>Path</key>
+				<string>SSDT-LID.aml</string>
+			</dict>
 		</array>
 		<key>Delete</key>
 		<array>
@@ -112,6 +123,44 @@
 		</array>
 		<key>Patch</key>
 		<array>
+			<dict>
+				<key>Base</key>
+				<string>\_SB.PCI0.SBRG.H_EC.LID0</string>
+				<key>BaseSkip</key>
+				<integer>0</integer>
+				<key>Comment</key>
+				<string>Rename _LID to XLID for SSDT-LID</string>
+				<key>Count</key>
+				<integer>1</integer>
+				<key>Enabled</key>
+				<true/>
+				<key>Find</key>
+				<data>
+				X0xJRA==
+				</data>
+				<key>Limit</key>
+				<integer>0</integer>
+				<key>Mask</key>
+				<data>
+				</data>
+				<key>OemTableId</key>
+				<data>
+				</data>
+				<key>Replace</key>
+				<data>
+				WExJRA==
+				</data>
+				<key>ReplaceMask</key>
+				<data>
+				</data>
+				<key>Skip</key>
+				<integer>0</integer>
+				<key>TableLength</key>
+				<integer>0</integer>
+				<key>TableSignature</key>
+				<data>
+				</data>
+			</dict>
 			<dict>
 				<key>Base</key>
 				<string></string>
@@ -252,7 +301,10 @@
 				<key>Address</key>
 				<integer>4275159040</integer>
 				<key>Comment</key>
-				<string>Haswell: SB_RCBA is a 0x4 page memory region, containing SPI_BASE at 0x3800 (SPI_BASE_ADDRESS)</string>
+				<string>
+      Haswell: SB_RCBA is a 0x4 page memory region, containing SPI_BASE at
+      0x3800 (SPI_BASE_ADDRESS)
+     </string>
 				<key>Enabled</key>
 				<false/>
 			</dict>
@@ -388,6 +440,24 @@
 				<key>Arch</key>
 				<string>Any</string>
 				<key>BundlePath</key>
+				<string>USBMapBluetooth.kext</string>
+				<key>Comment</key>
+				<string>Disabled-additional-USB-map-not-in-working-repo</string>
+				<key>Enabled</key>
+				<false/>
+				<key>ExecutablePath</key>
+				<string></string>
+				<key>MaxKernel</key>
+				<string></string>
+				<key>MinKernel</key>
+				<string>19.0.0</string>
+				<key>PlistPath</key>
+				<string>Contents/Info.plist</string>
+			</dict>
+			<dict>
+				<key>Arch</key>
+				<string>Any</string>
+				<key>BundlePath</key>
 				<string>Lilu.kext</string>
 				<key>Comment</key>
 				<string>Lilu 1.7.2 - patch engine (must be first)</string>
@@ -516,7 +586,7 @@
 				<key>BundlePath</key>
 				<string>NootedRed.kext</string>
 				<key>Comment</key>
-				<string>NootedRed 0.9.0 RELEASE artifact - AMD iGPU (BEFORE AppleALC)</string>
+				<string>NootedRed 0.8.10 RELEASE - AMD iGPU (BEFORE AppleALC)</string>
 				<key>Enabled</key>
 				<true/>
 				<key>ExecutablePath</key>
@@ -552,7 +622,7 @@
 				<key>BundlePath</key>
 				<string>RealtekRTL8111.kext</string>
 				<key>Comment</key>
-				<string>Realtek RTL8111 ethernet</string>
+				<string>Realtek RTL8111 Ethernet</string>
 				<key>Enabled</key>
 				<true/>
 				<key>ExecutablePath</key>
@@ -570,9 +640,9 @@
 				<key>BundlePath</key>
 				<string>rtw88.kext</string>
 				<key>Comment</key>
-				<string>Realtek Wi-Fi (rtw88)</string>
+				<string>Disabled while testing native AirPort_RTW88 1.0.3</string>
 				<key>Enabled</key>
-				<true/>
+				<false/>
 				<key>ExecutablePath</key>
 				<string>Contents/MacOS/rtw88</string>
 				<key>MaxKernel</key>
@@ -768,9 +838,9 @@
 				<key>BundlePath</key>
 				<string>VoodooSMBus.kext</string>
 				<key>Comment</key>
-				<string>SMBus (trackpad/ELAN if needed)</string>
+				<string>Disabled - duplicate VoodooI2CNativeEngine; trackpad uses VoodooI2CHID</string>
 				<key>Enabled</key>
-				<true/>
+				<false/>
 				<key>ExecutablePath</key>
 				<string>Contents/MacOS/VoodooSMBus</string>
 				<key>MaxKernel</key>
@@ -924,6 +994,96 @@
 				<key>PlistPath</key>
 				<string>Contents/Info.plist</string>
 			</dict>
+			<dict>
+				<key>Arch</key>
+				<string>x86_64</string>
+				<key>BundlePath</key>
+				<string>AMFIPass.kext</string>
+				<key>Comment</key>
+				<string>AMFIPass 1.4.1 for Sonoma Legacy Wi-Fi stack</string>
+				<key>Enabled</key>
+				<true/>
+				<key>ExecutablePath</key>
+				<string>Contents/MacOS/AMFIPass</string>
+				<key>MaxKernel</key>
+				<string></string>
+				<key>MinKernel</key>
+				<string>23.0.0</string>
+				<key>PlistPath</key>
+				<string>Contents/Info.plist</string>
+			</dict>
+			<dict>
+				<key>Arch</key>
+				<string>x86_64</string>
+				<key>BundlePath</key>
+				<string>IOSkywalkFamily.kext</string>
+				<key>Comment</key>
+				<string>Ventura IOSkywalkFamily for Sonoma Legacy Wi-Fi stack</string>
+				<key>Enabled</key>
+				<true/>
+				<key>ExecutablePath</key>
+				<string>Contents/MacOS/IOSkywalkFamily</string>
+				<key>MaxKernel</key>
+				<string></string>
+				<key>MinKernel</key>
+				<string>23.0.0</string>
+				<key>PlistPath</key>
+				<string>Contents/Info.plist</string>
+			</dict>
+			<dict>
+				<key>Arch</key>
+				<string>x86_64</string>
+				<key>BundlePath</key>
+				<string>IO80211FamilyLegacy.kext</string>
+				<key>Comment</key>
+				<string>Legacy IO80211 family for AirPort_RTW88</string>
+				<key>Enabled</key>
+				<true/>
+				<key>ExecutablePath</key>
+				<string>Contents/MacOS/IO80211FamilyLegacy</string>
+				<key>MaxKernel</key>
+				<string></string>
+				<key>MinKernel</key>
+				<string>23.0.0</string>
+				<key>PlistPath</key>
+				<string>Contents/Info.plist</string>
+			</dict>
+			<dict>
+				<key>Arch</key>
+				<string>x86_64</string>
+				<key>BundlePath</key>
+				<string>IO80211FamilyLegacy.kext/Contents/PlugIns/AirPortBrcmNIC.kext</string>
+				<key>Comment</key>
+				<string>Legacy AirPort plugin required by restored IO80211 stack</string>
+				<key>Enabled</key>
+				<true/>
+				<key>ExecutablePath</key>
+				<string>Contents/MacOS/AirPortBrcmNIC</string>
+				<key>MaxKernel</key>
+				<string></string>
+				<key>MinKernel</key>
+				<string>23.0.0</string>
+				<key>PlistPath</key>
+				<string>Contents/Info.plist</string>
+			</dict>
+			<dict>
+				<key>Arch</key>
+				<string>x86_64</string>
+				<key>BundlePath</key>
+				<string>AirPort_RTW88.kext</string>
+				<key>Comment</key>
+				<string>Native AirPort driver for RTL8821CE - v1.0.3</string>
+				<key>Enabled</key>
+				<true/>
+				<key>ExecutablePath</key>
+				<string>Contents/MacOS/AirPort_RTW88</string>
+				<key>MaxKernel</key>
+				<string></string>
+				<key>MinKernel</key>
+				<string>23.0.0</string>
+				<key>PlistPath</key>
+				<string>Contents/Info.plist</string>
+			</dict>
 		</array>
 		<key>Block</key>
 		<array>
@@ -947,9 +1107,9 @@
 				<key>Arch</key>
 				<string>x86_64</string>
 				<key>Comment</key>
-				<string></string>
+				<string>Block native IOSkywalkFamily for Sonoma Legacy Wi-Fi stack</string>
 				<key>Enabled</key>
-				<false/>
+				<true/>
 				<key>Identifier</key>
 				<string>com.apple.iokit.IOSkywalkFamily</string>
 				<key>MaxKernel</key>
@@ -1001,7 +1161,9 @@
 				<key>Arch</key>
 				<string>Any</string>
 				<key>BundlePath</key>
-				<string>System/Library/Extensions/IONetworkingFamily.kext/Contents/PlugIns/AppleIntel8254XEthernet.kext</string>
+				<string>
+      System/Library/Extensions/IONetworkingFamily.kext/Contents/PlugIns/AppleIntel8254XEthernet.kext
+     </string>
 				<key>Comment</key>
 				<string></string>
 				<key>Enabled</key>
@@ -1026,7 +1188,10 @@
 				<key>Base</key>
 				<string>_cpuid_set_info</string>
 				<key>Comment</key>
-				<string>algrey | Force cpuid_cores_per_package to constant (user-specified) | 10.13-10.14</string>
+				<string>
+      algrey | Force cpuid_cores_per_package to constant (user-specified) |
+      10.13-10.14
+     </string>
 				<key>Count</key>
 				<integer>1</integer>
 				<key>Enabled</key>
@@ -1064,7 +1229,10 @@
 				<key>Base</key>
 				<string>_cpuid_set_info</string>
 				<key>Comment</key>
-				<string>algrey | Force cpuid_cores_per_package to constant (user-specified) | 10.15-11.0</string>
+				<string>
+      algrey | Force cpuid_cores_per_package to constant (user-specified) |
+      10.15-11.0
+     </string>
 				<key>Count</key>
 				<integer>1</integer>
 				<key>Enabled</key>
@@ -1285,7 +1453,10 @@
 				<key>Base</key>
 				<string></string>
 				<key>Comment</key>
-				<string>algrey | _cpuid_set_generic_info | Replace rdmsr(0x8B) with constant 186 | 10.13+</string>
+				<string>
+      algrey | _cpuid_set_generic_info | Replace rdmsr(0x8B) with constant 186 |
+      10.13+
+     </string>
 				<key>Count</key>
 				<integer>1</integer>
 				<key>Enabled</key>
@@ -1764,7 +1935,10 @@
 				<key>Base</key>
 				<string></string>
 				<key>Comment</key>
-				<string>Visual | thread_quantum_expire, thread_unblock, thread_invoke | Remove non-monotonic time panic | 12.0+</string>
+				<string>
+      Visual | thread_quantum_expire, thread_unblock, thread_invoke | Remove
+      non-monotonic time panic | 12.0+
+     </string>
 				<key>Count</key>
 				<integer>3</integer>
 				<key>Enabled</key>
@@ -1802,7 +1976,10 @@
 				<key>Base</key>
 				<string></string>
 				<key>Comment</key>
-				<string>Visual | thread_invoke, thread_dispatch | Remove non-monotonic time panic | 12.0-26.3</string>
+				<string>
+      Visual | thread_invoke, thread_dispatch | Remove non-monotonic time panic
+      | 12.0-26.3
+     </string>
 				<key>Count</key>
 				<integer>2</integer>
 				<key>Enabled</key>
@@ -1840,7 +2017,10 @@
 				<key>Base</key>
 				<string></string>
 				<key>Comment</key>
-				<string>laobamac | thread_invoke, thread_dispatch | Remove non-monotonic time panic | 26.4+</string>
+				<string>
+      laobamac | thread_invoke, thread_dispatch | Remove non-monotonic time
+      panic | 26.4+
+     </string>
 				<key>Count</key>
 				<integer>2</integer>
 				<key>Enabled</key>
@@ -2154,7 +2334,9 @@
 				<key>Name</key>
 				<string>CustomOS</string>
 				<key>Path</key>
-				<string>PciRoot(0x0)/Pci(0x1,0x1)/Pci(0x0,0x0)/NVMe(0x1,11-22-33-44-55-66-77-88)/HD(1,GPT,00000000-0000-0000-0000-000000000000,0x800,0x64000)/\EFI\BOOT\BOOTX64.EFI</string>
+				<string>
+      PciRoot(0x0)/Pci(0x1,0x1)/Pci(0x0,0x0)/NVMe(0x1,11-22-33-44-55-66-77-88)/HD(1,GPT,00000000-0000-0000-0000-000000000000,0x800,0x64000)/\EFI\BOOT\BOOTX64.EFI
+     </string>
 				<key>TextMode</key>
 				<false/>
 			</dict>

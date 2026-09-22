@@ -4,19 +4,19 @@
 
 OpenCore EFI untuk **Infinix XBOOK 15 BL51A5** dengan AMD Ryzen 7 5825U dan iGPU Radeon Vega 8.
 
-Snapshot ini diekspor dari EFI yang dipakai harian pada **14 Agustus 2026**. Konfigurasi ini stabil untuk penggunaan harian pada macOS Tahoe 26.5; keterbatasan yang masih terasa terutama berupa artifact sesekali pada aplikasi Electron/Chromium. Semua identitas SMBIOS di repo sudah diganti dengan placeholder.
+Snapshot ini diekspor dari EFI aktif pada **22 September 2026** dan ditujukan untuk **macOS Sonoma 14.8.9 (23J631)**. Semua identitas SMBIOS di repo sudah diganti dengan placeholder.
 
-![macOS Tahoe 26.5 berjalan pada Infinix XBOOK 15 BL51A5](docs/images/tahoe-26.5-about.png)
+![Instalasi macOS Tahoe sebelumnya pada Infinix XBOOK 15 BL51A5](docs/images/tahoe-26.5-about.png)
 
 ## Dukungan macOS
 
 | Versi | Status | Catatan |
 |---|---|---|
-| macOS Tahoe 26.5 | ✅ Diuji langsung | Sistem utama saat snapshot dibuat |
-| macOS Sequoia 15.7 | ✅ Pernah diuji | ACPI, kernel patch, dan susunan kext yang sama; lakukan backup sebelum berpindah versi |
-| Sonoma dan lebih lama | ⚠️ Tidak menjadi target snapshot | Mungkin bisa boot, tetapi tidak diuji dengan config ini |
+| macOS Sonoma 14.8.9 | ✅ Diuji langsung | Target utama snapshot ini |
+| macOS Tahoe 26.5 | ✅ Pernah diuji | Snapshot repo sebelumnya memakai FeiXiao `rtw88` + Starskiff |
+| macOS Sequoia 15.7 | ✅ Pernah diuji | Backup EFI sebelum berpindah versi |
 
-Config OpenCore ini tidak dikunci khusus ke Tahoe. Kernel patch AMD, ACPI, dan kext utamanya dapat dipakai di **Tahoe maupun Sequoia**. Namun, update macOS atau kext tetap dapat mengubah kompatibilitas.
+Snapshot ini menyertakan Legacy IO80211 stack Sonoma untuk AirPort_RTW88. Jangan menganggap konfigurasi Wi-Fi yang sama cocok untuk macOS lebih baru tanpa mengujinya dari USB EFI terlebih dahulu.
 
 ## Hardware
 
@@ -40,10 +40,10 @@ Config OpenCore ini tidak dikunci khusus ke Tahoe. Kernel patch AMD, ACPI, dan k
 
 | Fitur | Status | Catatan |
 |---|---|---|
-| OpenCore picker dan boot macOS | ✅ Bekerja | Tahoe 26.5 diuji sebagai sistem utama |
+| OpenCore picker dan boot macOS | ✅ Bekerja | Sonoma 14.8.9 diuji sebagai sistem utama |
 | CPU 8C/16T | ✅ Bekerja | Kernel patch AMD + ForgedInvariant |
 | CPU power management | ✅ Bekerja | AMDRyzenCPUPowerManagement, SMCAMDProcessor, dan SSDT-CPUR |
-| iGPU Vega 8 + Metal | ✅ Stabil untuk penggunaan harian | NootedRed memberi akselerasi; artifact sesekali masih dapat muncul pada aplikasi Electron/Chromium |
+| iGPU Vega 8 + Metal | ⚠️ Bekerja dengan keterbatasan | NootedRed memberi akselerasi; GPU reset atau artifact dapat terjadi pada aplikasi tertentu |
 | Internal display | ✅ Bekerja | Termasuk backlight |
 | Keyboard | ✅ Bekerja | VoodooPS2Controller |
 | Trackpad I2C | ✅ Bekerja | VoodooI2C + VoodooI2CHID; gesture tertentu dapat berbeda |
@@ -51,17 +51,17 @@ Config OpenCore ini tidak dikunci khusus ke Tahoe. Kernel patch AMD, ACPI, dan k
 | Battery status | ✅ Bekerja | SMCBatteryManager |
 | NVMe | ✅ Bekerja | NVMeFix aktif |
 | Ethernet | ✅ Driver aktif | RealtekRTL8111 |
-| Wi-Fi RTL8821CE | ✅ Bekerja lewat Starskiff | Tidak tampil sebagai AirPort/CoreWLAN native |
-| Wi-Fi lewat System Settings | ❌ Tidak bekerja | `rtw88` memublikasikan interface Ethernet; gunakan Starskiff |
+| Wi-Fi RTL8821CE | ⚠️ Eksperimental | UI Wi-Fi native melalui AirPort_RTW88 1.0.3; data-path kadang macet |
+| Recovery Wi-Fi | ⚠️ Tidak andal | Power-cycle setelah stall pernah memicu kernel panic; lihat issue di bawah |
 | Bluetooth Realtek | ✅ Bekerja pada unit pengujian | RealtekBluetoothFirmware + BlueToolFixup |
-| AirDrop / AWDL / Continuity penuh | ❌ Tidak bekerja | RTL8821CE bukan kartu AirPort dan driver tidak menyediakan AWDL |
+| AirDrop / AWDL / Continuity penuh | ❌ Tidak andal | AirPort_RTW88 belum menyediakan dukungan AWDL/Continuity yang siap dipakai harian |
 | Audio | ✅ Bekerja | AppleALC setelah NootedRed, layout-id 55 |
 | Sleep/wake | ✅ Bekerja pada unit pengujian | Tetap uji setelah mengubah USB mapping, Bluetooth, atau versi macOS |
 | DRM / streaming protected content | ⚠️ Tidak dijamin | `unfairgva=1` sengaja dihapus karena tidak memperbaiki reset GPU |
 
 ## Batasan grafis NootedRed
 
-EFI ini memakai **NootedRed 0.9.0 RELEASE artifact** yang dibangun pada 1 Agustus 2026 dengan macOS 26.5 SDK. Binary ini sama dengan yang dipakai pada snapshot stabil 14 Agustus 2026 dan terasa lebih baik daripada 0.8.10 pada unit pengujian, tetapi belum menghilangkan semua masalah grafis.
+EFI ini sekarang memakai **NootedRed 0.8.10**, sesuai EFI Sonoma aktif. Akselerasi grafis bekerja pada unit pengujian, tetapi keterbatasan NootedRed tetap dapat berbeda tergantung versi macOS dan beban kerja.
 
 Gejala pada build sebelumnya yang pernah terkonfirmasi melalui laporan `.gpuRestart`:
 
@@ -69,7 +69,7 @@ Gejala pada build sebelumnya yang pernah terkonfirmasi melalui laporan `.gpuRest
 - App Store dan `mediaanalysisd` juga dapat memicu reset pada shader `VTMTSComputeFunction`.
 - Menambah UMA dari 512 MB ke 1 GB membantu ruang grafis, tetapi tidak menyelesaikan bug driver.
 
-Pada snapshot saat ini, Safari, App Store, dan fungsi harian lain berjalan stabil pada unit pengujian. Masalah tersisa yang terlihat adalah artifact sesekali pada aplikasi Chromium/Electron seperti Discord, Spotify, Termius, dan Brave ketika hardware acceleration aktif.
+Akselerasi grafis tersedia, tetapi stabilitas bergantung pada aplikasi dan build macOS. GPU reset pernah tercatat, dan aplikasi Chromium/Electron seperti Discord, Spotify, Termius, dan Brave dapat menampilkan artifact ketika hardware acceleration aktif.
 
 Workaround harian:
 
@@ -89,24 +89,21 @@ revcpu=1 -NRedDPDelay
 
 ## Wi-Fi dan Bluetooth
 
-RTL8821CE tidak dikenali sebagai Wi-Fi native oleh CoreWLAN. Driver `rtw88.kext` membuat interface `en0` bertipe Ethernet dan **Starskiff** berkomunikasi langsung dengan user-client driver.
+Pada Sonoma, snapshot ini memakai AirPort_RTW88 bersama Legacy IO80211 stack sehingga RTL8821CE tampil di UI Wi-Fi native Apple. `rtw88.kext` FeiXiao lama tetap disimpan sebagai fallback dalam keadaan disabled dan tidak boleh diaktifkan bersamaan.
 
 Komponen:
 
 | Peran | Komponen |
 |---|---|
-| Driver Wi-Fi | `rtw88.kext` |
-| UI Wi-Fi | Starskiff |
+| Driver Wi-Fi | `AirPort_RTW88.kext` 1.0.3 |
+| Compatibility stack | `AMFIPass.kext`, `IOSkywalkFamily.kext`, `IO80211FamilyLegacy.kext` |
+| Fallback disabled | FeiXiao `rtw88.kext` 1.0.1 + Starskiff |
 | Firmware Bluetooth | `RealtekBluetoothFirmware.kext` |
 | Patch Bluetooth Monterey+ | `BlueToolFixup.kext` |
 
-Setelah instalasi:
+Known issue: koneksi dapat tetap terlihat tersambung saat data-path berhenti mengalirkan trafik. Recovery Wi-Fi off/on juga pernah diikuti kernel panic stack-corruption di `airportd`/`apple80211_ioctl`. Lihat [Airport_RTW88 issue #4](https://github.com/xnoah222/Airport_RTW88/issues/4). Siapkan Ethernet atau jalur recovery lain dan jangan menganggap setup Wi-Fi ini production-stable.
 
-1. Install Starskiff dari `Extras/Starskiff-v1.0.0.dmg` atau gunakan rilis yang lebih baru.
-2. Tambahkan Starskiff ke **System Settings → General → Login Items**.
-3. Hubungkan Wi-Fi melalui ikon Starskiff, bukan menu Wi-Fi Apple.
-
-AirDrop tidak dapat diperbaiki hanya dengan mengubah config. Untuk AirDrop dibutuhkan hardware dan driver dengan dukungan AWDL.
+AirDrop tidak dapat dibuat andal hanya dengan mengubah config. Dibutuhkan dukungan AWDL yang bekerja pada hardware dan driver.
 
 ## BIOS
 
@@ -157,13 +154,17 @@ Sesuaikan nama volume target. Script sebaiknya dijalankan dari Recovery.
 
 | Komponen | Versi |
 |---|---|
-| NootedRed | 0.9.0 RELEASE artifact, build 1 Agustus 2026 (macOS 26.5 SDK) |
+| NootedRed | 0.8.10 |
 | Lilu | 1.7.2 |
 | VirtualSMC | 1.3.7 |
 | AppleALC | 1.9.7 |
 | RestrictEvents | 1.1.6 |
-| RealtekRTL8111 | 3.0.4 |
-| rtw88 | 1.0.1 |
+| RealtekRTL8111 | 3.0.0 |
+| AirPort_RTW88 | 1.0.3 |
+| AMFIPass | 1.4.1 |
+| IO80211FamilyLegacy | 12.0 |
+| IOSkywalkFamily | 1.0 |
+| rtw88 fallback | 1.0.1 (disabled) |
 | VoodooI2C | 2.9.1 |
 | VoodooPS2Controller | 2.3.7 |
 | AMDRyzenCPUPowerManagement | 0.7.2 |
@@ -198,7 +199,7 @@ File backup/debug dari EFI harian sengaja tidak ikut dimasukkan.
 - [NootedRed](https://github.com/ChefKissInc/NootedRed)
 - [AMD Vanilla](https://github.com/AMD-OSX/AMD_Vanilla)
 - [VoodooI2C](https://github.com/VoodooI2C/VoodooI2C)
-- FeiXiao/rtw88, Starskiff, dan RealtekBluetoothFirmware
+- Airport_RTW88, FeiXiao/rtw88, Starskiff, dan RealtekBluetoothFirmware
 - Acidanthera, ChefKissInc, AMD-OSX, Mieze, dan komunitas Hackintosh
 
 ## Disclaimer
