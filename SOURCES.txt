@@ -1,8 +1,8 @@
-Updated: 2026-09-22 from the active EFI on Infinix BL51A5
+Updated: 2026-10-02 from the active EFI on Infinix BL51A5
 Tested profile: BL51A5 + macOS Sonoma 14.8.9 (direct); Tahoe 26.5 and Sequoia 15.7 (previous)
 Recovery: Sequoia BaseSystem.dmg on OC-ESP
 
-Wi-Fi: AirPort_RTW88 1.0.3 + Sonoma Legacy IO80211 stack; FeiXiao rtw88 + Starskiff kept disabled as fallback
+Wi-Fi: AirPort_RTW88 2.0.0 hibernation-safe (Realtek-AirPort-Family 1.0.0) + Sonoma Legacy IO80211 stack; FeiXiao rtw88 + Starskiff kept disabled as fallback
 NootedRed fix script: Extras/fix-nootedred.sh
 
 Local edits:
@@ -14,4 +14,4 @@ Local edits:
 - ACPI: includes SSDT-CPUR + CPUR table deletion for the Ryzen 7 5825U
 - RealtekBluetoothFirmware Info.plist: personality 0bda:c821
 - NootedRed 0.8.10 — active Sonoma snapshot
-- AirPort_RTW88 1.0.3 known issue: intermittent data-path stall; Wi-Fi power-cycle has been followed by a kernel panic (upstream issue #4)
+- AirPort_RTW88 2.0.0 staged from Realtek-AirPort-Family 1.0.0 release ZIP (digest-verified); runtime verification pending. 1.0.3 history: intermittent data-path stall; Wi-Fi power-cycle has been followed by a kernel panic (upstream issue #4)

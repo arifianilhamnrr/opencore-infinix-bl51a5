@@ -15,13 +15,13 @@
 	<key>CFBundleDisplayName</key>
 	<string>AirPort_RTW88 for RTL88xx</string>
 	<key>CFBundleGetInfoString</key>
-	<string>AirPort_RTW88 1.0.3 — Ventura legacy-stack alignment build</string>
+	<string>AirPort_RTW88 2.0.0 — hibernation-safe power-management build</string>
 	<key>CFBundlePackageType</key>
 	<string>KEXT</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0.3</string>
+	<string>2.0.0</string>
 	<key>CFBundleVersion</key>
-	<string>1.0.3</string>
+	<string>2.0.0</string>
 	<key>CFBundleSupportedPlatforms</key>
 	<array>
 		<string>MacOSX</string>

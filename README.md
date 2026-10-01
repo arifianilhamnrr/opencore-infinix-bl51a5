@@ -51,7 +51,7 @@ This snapshot contains the Sonoma Legacy IO80211 stack for AirPort_RTW88. Do not
 | Battery status | ✅ Working | SMCBatteryManager |
 | NVMe | ✅ Working | NVMeFix enabled |
 | Ethernet | ✅ Driver active | RealtekRTL8111 |
-| RTL8821CE Wi-Fi | ⚠️ Experimental | Native Wi-Fi UI through AirPort_RTW88 1.0.3; intermittent data-path stalls are known |
+| RTL8821CE Wi-Fi | ⚠️ Experimental | Native Wi-Fi UI through AirPort_RTW88 2.0.0 (Realtek-AirPort-Family 1.0.0); staged in EFI, runtime verification pending |
 | Wi-Fi recovery | ⚠️ Unreliable | Power-cycling Wi-Fi after a stall has triggered a kernel panic; see issue linked below |
 | Realtek Bluetooth | ✅ Working on the tested unit | RealtekBluetoothFirmware + BlueToolFixup |
 | Full AirDrop / AWDL / Continuity | ❌ Not reliable | AirPort_RTW88 does not provide production-ready AWDL/Continuity support |
@@ -95,7 +95,7 @@ Components:
 
 | Role | Component |
 |---|---|
-| Wi-Fi driver | `AirPort_RTW88.kext` 1.0.3 |
+| Wi-Fi driver | `AirPort_RTW88.kext` 2.0.0 |
 | Compatibility stack | `AMFIPass.kext`, `IOSkywalkFamily.kext`, `IO80211FamilyLegacy.kext` |
 | Disabled fallback | FeiXiao `rtw88.kext` 1.0.1 + Starskiff |
 | Bluetooth firmware | `RealtekBluetoothFirmware.kext` |
@@ -160,7 +160,7 @@ Adjust the target volume name as needed. The script should be run from Recovery.
 | AppleALC | 1.9.7 |
 | RestrictEvents | 1.1.6 |
 | RealtekRTL8111 | 3.0.0 |
-| AirPort_RTW88 | 1.0.3 |
+| AirPort_RTW88 | 2.0.0 |
 | AMFIPass | 1.4.1 |
 | IO80211FamilyLegacy | 12.0 |
 | IOSkywalkFamily | 1.0 |

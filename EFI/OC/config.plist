@@ -640,7 +640,7 @@
 				<key>BundlePath</key>
 				<string>rtw88.kext</string>
 				<key>Comment</key>
-				<string>Disabled while testing native AirPort_RTW88 1.0.3</string>
+				<string>Disabled while testing native AirPort_RTW88 2.0.0</string>
 				<key>Enabled</key>
 				<false/>
 				<key>ExecutablePath</key>
@@ -1072,7 +1072,7 @@
 				<key>BundlePath</key>
 				<string>AirPort_RTW88.kext</string>
 				<key>Comment</key>
-				<string>Native AirPort driver for RTL8821CE - v1.0.3</string>
+				<string>Native AirPort driver for RTL8821CE - v2.0.0 hibernation-safe (Realtek-AirPort-Family 1.0.0)</string>
 				<key>Enabled</key>
 				<true/>
 				<key>ExecutablePath</key>

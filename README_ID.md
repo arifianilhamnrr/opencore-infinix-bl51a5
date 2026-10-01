@@ -51,7 +51,7 @@ Snapshot ini menyertakan Legacy IO80211 stack Sonoma untuk AirPort_RTW88. Jangan
 | Battery status | ✅ Bekerja | SMCBatteryManager |
 | NVMe | ✅ Bekerja | NVMeFix aktif |
 | Ethernet | ✅ Driver aktif | RealtekRTL8111 |
-| Wi-Fi RTL8821CE | ⚠️ Eksperimental | UI Wi-Fi native melalui AirPort_RTW88 1.0.3; data-path kadang macet |
+| Wi-Fi RTL8821CE | ⚠️ Eksperimental | UI Wi-Fi native melalui AirPort_RTW88 2.0.0 (Realtek-AirPort-Family 1.0.0); staged di EFI, verifikasi runtime menyusul |
 | Recovery Wi-Fi | ⚠️ Tidak andal | Power-cycle setelah stall pernah memicu kernel panic; lihat issue di bawah |
 | Bluetooth Realtek | ✅ Bekerja pada unit pengujian | RealtekBluetoothFirmware + BlueToolFixup |
 | AirDrop / AWDL / Continuity penuh | ❌ Tidak andal | AirPort_RTW88 belum menyediakan dukungan AWDL/Continuity yang siap dipakai harian |
@@ -95,7 +95,7 @@ Komponen:
 
 | Peran | Komponen |
 |---|---|
-| Driver Wi-Fi | `AirPort_RTW88.kext` 1.0.3 |
+| Driver Wi-Fi | `AirPort_RTW88.kext` 2.0.0 |
 | Compatibility stack | `AMFIPass.kext`, `IOSkywalkFamily.kext`, `IO80211FamilyLegacy.kext` |
 | Fallback disabled | FeiXiao `rtw88.kext` 1.0.1 + Starskiff |
 | Firmware Bluetooth | `RealtekBluetoothFirmware.kext` |
@@ -160,7 +160,7 @@ Sesuaikan nama volume target. Script sebaiknya dijalankan dari Recovery.
 | AppleALC | 1.9.7 |
 | RestrictEvents | 1.1.6 |
 | RealtekRTL8111 | 3.0.0 |
-| AirPort_RTW88 | 1.0.3 |
+| AirPort_RTW88 | 2.0.0 |
 | AMFIPass | 1.4.1 |
 | IO80211FamilyLegacy | 12.0 |
 | IOSkywalkFamily | 1.0 |
