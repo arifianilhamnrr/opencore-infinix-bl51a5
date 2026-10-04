@@ -4,7 +4,9 @@
 
 OpenCore EFI untuk **Infinix XBOOK 15 BL51A5** dengan AMD Ryzen 7 5825U dan iGPU Radeon Vega 8.
 
-Snapshot ini diekspor dari EFI aktif pada **22 September 2026** dan ditujukan untuk **macOS Sonoma 14.8.9 (23J631)**. Semua identitas SMBIOS di repo sudah diganti dengan placeholder.
+Snapshot ini diekspor dari EFI aktif pada **4 Oktober 2026** dan ditujukan untuk **macOS Sonoma 14.8.9 (23J631)**.
+
+![macOS Sonoma 14.8.9 Wi-Fi dan throughput jaringan pada Infinix XBOOK 15 BL51A5](docs/images/sonoma-14.8-wifi-speedtest.png)
 
 ![Instalasi macOS Tahoe sebelumnya pada Infinix XBOOK 15 BL51A5](docs/images/tahoe-26.5-about.png)
 
@@ -16,7 +18,7 @@ Snapshot ini diekspor dari EFI aktif pada **22 September 2026** dan ditujukan un
 | macOS Tahoe 26.5 | ✅ Pernah diuji | Snapshot repo sebelumnya memakai FeiXiao `rtw88` + Starskiff |
 | macOS Sequoia 15.7 | ✅ Pernah diuji | Backup EFI sebelum berpindah versi |
 
-Snapshot ini menyertakan Legacy IO80211 stack Sonoma untuk AirPort_RTW88. Jangan menganggap konfigurasi Wi-Fi yang sama cocok untuk macOS lebih baru tanpa mengujinya dari USB EFI terlebih dahulu.
+Snapshot ini menyertakan Legacy IO80211 stack Sonoma untuk AirPortRTW. Jangan menganggap konfigurasi Wi-Fi yang sama cocok untuk macOS lebih baru tanpa mengujinya dari USB EFI terlebih dahulu.
 
 ## Hardware
 
@@ -51,10 +53,10 @@ Snapshot ini menyertakan Legacy IO80211 stack Sonoma untuk AirPort_RTW88. Jangan
 | Battery status | ✅ Bekerja | SMCBatteryManager |
 | NVMe | ✅ Bekerja | NVMeFix aktif |
 | Ethernet | ✅ Driver aktif | RealtekRTL8111 |
-| Wi-Fi RTL8821CE | ⚠️ Eksperimental | UI Wi-Fi native melalui AirPort_RTW88 2.0.0 (Realtek-AirPort-Family 1.0.0); staged di EFI, verifikasi runtime menyusul |
-| Recovery Wi-Fi | ⚠️ Tidak andal | Power-cycle setelah stall pernah memicu kernel panic; lihat issue di bawah |
+| Wi-Fi RTL8821CE | ✅ Bekerja | UI Wi-Fi native melalui AirPortRTW 1.0.1 (JoMei9019-real); throughput 40–50+ Mbps terverifikasi di Sonoma 14.8.9 |
+| Recovery Wi-Fi | ✅ Ditingkatkan | AirPortRTW 1.0.1 dilengkapi output queue gating (STA_R10/R11) dan sinkronisasi NAPI saat sleep |
 | Bluetooth Realtek | ✅ Bekerja pada unit pengujian | RealtekBluetoothFirmware + BlueToolFixup |
-| AirDrop / AWDL / Continuity penuh | ❌ Tidak andal | AirPort_RTW88 belum menyediakan dukungan AWDL/Continuity yang siap dipakai harian |
+| AirDrop / AWDL / Continuity penuh | ❌ Tidak andal | AirPortRTW belum menyediakan dukungan AWDL/Continuity yang siap dipakai harian |
 | Audio | ✅ Bekerja | AppleALC setelah NootedRed, layout-id 55 |
 | Sleep/wake | ✅ Bekerja pada unit pengujian | Tetap uji setelah mengubah USB mapping, Bluetooth, atau versi macOS |
 | DRM / streaming protected content | ⚠️ Tidak dijamin | `unfairgva=1` sengaja dihapus karena tidak memperbaiki reset GPU |
@@ -89,19 +91,17 @@ revcpu=1 -NRedDPDelay
 
 ## Wi-Fi dan Bluetooth
 
-Pada Sonoma, snapshot ini memakai AirPort_RTW88 bersama Legacy IO80211 stack sehingga RTL8821CE tampil di UI Wi-Fi native Apple. `rtw88.kext` FeiXiao lama tetap disimpan sebagai fallback dalam keadaan disabled dan tidak boleh diaktifkan bersamaan.
+Pada Sonoma, snapshot ini memakai AirPortRTW (JoMei9019-real) bersama Legacy IO80211 stack sehingga RTL8821CE tampil di UI Wi-Fi native Apple. `AirPort_RTW88.kext` dan `rtw88.kext` FeiXiao lama tetap disimpan sebagai fallback dalam keadaan disabled dan tidak boleh diaktifkan bersamaan.
 
 Komponen:
 
 | Peran | Komponen |
 |---|---|
-| Driver Wi-Fi | `AirPort_RTW88.kext` 2.0.0 |
+| Driver Wi-Fi | `AirPortRTW.kext` 1.0.1 (JoMei9019-real) |
 | Compatibility stack | `AMFIPass.kext`, `IOSkywalkFamily.kext`, `IO80211FamilyLegacy.kext` |
-| Fallback disabled | FeiXiao `rtw88.kext` 1.0.1 + Starskiff |
+| Fallback disabled | `AirPort_RTW88.kext` 2.0.0, FeiXiao `rtw88.kext` 1.0.1 + Starskiff |
 | Firmware Bluetooth | `RealtekBluetoothFirmware.kext` |
 | Patch Bluetooth Monterey+ | `BlueToolFixup.kext` |
-
-Known issue: koneksi dapat tetap terlihat tersambung saat data-path berhenti mengalirkan trafik. Recovery Wi-Fi off/on juga pernah diikuti kernel panic stack-corruption di `airportd`/`apple80211_ioctl`. Lihat [Airport_RTW88 issue #4](https://github.com/xnoah222/Airport_RTW88/issues/4). Siapkan Ethernet atau jalur recovery lain dan jangan menganggap setup Wi-Fi ini production-stable.
 
 AirDrop tidak dapat dibuat andal hanya dengan mengubah config. Dibutuhkan dukungan AWDL yang bekerja pada hardware dan driver.
 
@@ -120,18 +120,9 @@ Gunakan pengaturan berikut:
 
 Jangan mengubah menu engineer/advanced yang tidak dipahami. Backup setting BIOS dan EFI sebelum eksperimen.
 
-## Sebelum digunakan: buat SMBIOS sendiri
+## SMBIOS
 
-Repo publik ini **tidak berisi identitas mesin asli**. Nilai berikut adalah placeholder:
-
-| Field | Placeholder |
-|---|---|
-| SystemSerialNumber | `XXXXXXXXXXXX` |
-| MLB | `M0000000000000001` |
-| SystemUUID | `00000000-0000-0000-0000-000000000000` |
-| ROM | `11:22:33:44:55:66` |
-
-Generate nilai unik menggunakan GenSMBIOS/macserial sebelum login ke iCloud. Jangan memakai serial dari repo orang lain dan jangan pernah commit identitas mesin pribadi.
+Generate nilai SMBIOS sendiri (model `MacBookPro16,2`) menggunakan GenSMBIOS atau macserial sebelum login ke layanan Apple (iCloud, iMessage, FaceTime). Detail panduan ada di `SMBIOS.txt`.
 
 ## Instalasi singkat
 
@@ -160,7 +151,8 @@ Sesuaikan nama volume target. Script sebaiknya dijalankan dari Recovery.
 | AppleALC | 1.9.7 |
 | RestrictEvents | 1.1.6 |
 | RealtekRTL8111 | 3.0.0 |
-| AirPort_RTW88 | 2.0.0 |
+| AirPortRTW | 1.0.1 |
+| AirPort_RTW88 | 2.0.0 (fallback disabled) |
 | AMFIPass | 1.4.1 |
 | IO80211FamilyLegacy | 12.0 |
 | IOSkywalkFamily | 1.0 |

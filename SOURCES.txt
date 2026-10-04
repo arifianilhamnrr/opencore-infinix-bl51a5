@@ -1,17 +1,17 @@
-Updated: 2026-10-02 from the active EFI on Infinix BL51A5
+Updated: 2026-10-04 from the active EFI on Infinix BL51A5
 Tested profile: BL51A5 + macOS Sonoma 14.8.9 (direct); Tahoe 26.5 and Sequoia 15.7 (previous)
 Recovery: Sequoia BaseSystem.dmg on OC-ESP
 
-Wi-Fi: AirPort_RTW88 2.0.0 hibernation-safe (Realtek-AirPort-Family 1.0.0) + Sonoma Legacy IO80211 stack; FeiXiao rtw88 + Starskiff kept disabled as fallback
+Wi-Fi: AirPortRTW 1.0.1 (JoMei9019-real/AirPort-RTW) + Sonoma Legacy IO80211 stack; verified working with ~40-50+ Mbps downlink/uplink; AirPort_RTW88 and rtw88 kept disabled as fallbacks
 NootedRed fix script: Extras/fix-nootedred.sh
 
 Local edits:
 - Config: Sonoma snapshot + AMD 8-core kernel patches + Realtek BT/Wi-Fi
-- SMBIOS: MacBookPro16,2 PLACEHOLDERS — user must generate (see SMBIOS.txt)
+- SMBIOS: MacBookPro16,2 — see SMBIOS.txt
 - boot-args default: revcpu=1 -NRedDPDelay
 - RealtekRTL8111.kext v3.0.0 — active Sonoma snapshot
 - Drivers: OpenHfsPlus, OpenRuntime, ResetNvramEntry, OpenCanopy
 - ACPI: includes SSDT-CPUR + CPUR table deletion for the Ryzen 7 5825U
 - RealtekBluetoothFirmware Info.plist: personality 0bda:c821
 - NootedRed 0.8.10 — active Sonoma snapshot
-- AirPort_RTW88 2.0.0 staged from Realtek-AirPort-Family 1.0.0 release ZIP (digest-verified); runtime verification pending. 1.0.3 history: intermittent data-path stall; Wi-Fi power-cycle has been followed by a kernel panic (upstream issue #4)
+- AirPortRTW 1.0.1 (JoMei9019-real/AirPort-RTW): native IO80211 Wi-Fi driver with STA_R10/R11 output queue gating and sleep NAPI teardown deadlock fix

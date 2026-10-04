@@ -1072,11 +1072,29 @@
 				<key>BundlePath</key>
 				<string>AirPort_RTW88.kext</string>
 				<key>Comment</key>
-				<string>Native AirPort driver for RTL8821CE - v2.0.0 hibernation-safe (Realtek-AirPort-Family 1.0.0)</string>
+				<string>Native AirPort driver for RTL8821CE - v2.0.0 (disabled while using AirPortRTW 1.0.1)</string>
+				<key>Enabled</key>
+				<false/>
+				<key>ExecutablePath</key>
+				<string>Contents/MacOS/AirPort_RTW88</string>
+				<key>MaxKernel</key>
+				<string></string>
+				<key>MinKernel</key>
+				<string>23.0.0</string>
+				<key>PlistPath</key>
+				<string>Contents/Info.plist</string>
+			</dict>
+			<dict>
+				<key>Arch</key>
+				<string>x86_64</string>
+				<key>BundlePath</key>
+				<string>AirPortRTW.kext</string>
+				<key>Comment</key>
+				<string>Native AirPort driver for RTL8821CE - v1.0.1 (JoMei9019-real/AirPort-RTW)</string>
 				<key>Enabled</key>
 				<true/>
 				<key>ExecutablePath</key>
-				<string>Contents/MacOS/AirPort_RTW88</string>
+				<string>Contents/MacOS/AirPortRTW</string>
 				<key>MaxKernel</key>
 				<string></string>
 				<key>MinKernel</key>
