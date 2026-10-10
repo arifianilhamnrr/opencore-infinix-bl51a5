@@ -1,8 +1,8 @@
-Updated: 2026-10-04 from the active EFI on Infinix BL51A5
+Updated: 2026-10-10 from the active EFI on Infinix BL51A5
 Tested profile: BL51A5 + macOS Sonoma 14.8.9 (direct); Tahoe 26.5 and Sequoia 15.7 (previous)
 Recovery: Sequoia BaseSystem.dmg on OC-ESP
 
-Wi-Fi: AirPortRTW 1.0.1 (JoMei9019-real/AirPort-RTW) + Sonoma Legacy IO80211 stack; verified working with ~40-50+ Mbps downlink/uplink; AirPort_RTW88 and rtw88 kept disabled as fallbacks
+Wi-Fi: AirPortRTW 1.0.2 (JoMei9019-real/AirPort-RTW) + Sonoma Legacy IO80211 stack; verified working with ~40-50+ Mbps downlink/uplink; AirPort_RTW88 and rtw88 kept disabled as fallbacks
 NootedRed fix script: Extras/fix-nootedred.sh
 
 Local edits:
@@ -14,4 +14,4 @@ Local edits:
 - ACPI: includes SSDT-CPUR + CPUR table deletion for the Ryzen 7 5825U
 - RealtekBluetoothFirmware Info.plist: personality 0bda:c821
 - NootedRed 0.8.10 — active Sonoma snapshot
-- AirPortRTW 1.0.1 (JoMei9019-real/AirPort-RTW): native IO80211 Wi-Fi driver with STA_R10/R11 output queue gating and sleep NAPI teardown deadlock fix
+- AirPortRTW 1.0.2 (JoMei9019-real/AirPort-RTW): native IO80211 Wi-Fi driver with output queue gating, AWDL power fencing, and sleep/wake shutdown ordering fixes

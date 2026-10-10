@@ -53,8 +53,8 @@ Snapshot ini menyertakan Legacy IO80211 stack Sonoma untuk AirPortRTW. Jangan me
 | Battery status | ✅ Bekerja | SMCBatteryManager |
 | NVMe | ✅ Bekerja | NVMeFix aktif |
 | Ethernet | ✅ Driver aktif | RealtekRTL8111 |
-| Wi-Fi RTL8821CE | ✅ Bekerja | UI Wi-Fi native melalui AirPortRTW 1.0.1 (JoMei9019-real); throughput 40–50+ Mbps terverifikasi di Sonoma 14.8.9 |
-| Recovery Wi-Fi | ✅ Ditingkatkan | AirPortRTW 1.0.1 dilengkapi output queue gating (STA_R10/R11) dan sinkronisasi NAPI saat sleep |
+| Wi-Fi RTL8821CE | ✅ Bekerja | UI Wi-Fi native melalui AirPortRTW 1.0.2 (JoMei9019-real); throughput 40–50+ Mbps terverifikasi di Sonoma 14.8.9 |
+| Recovery Wi-Fi | ✅ Ditingkatkan | AirPortRTW 1.0.2 dilengkapi output queue gating, AWDL power fencing, dan perbaikan sleep/wake |
 | Bluetooth Realtek | ✅ Bekerja pada unit pengujian | RealtekBluetoothFirmware + BlueToolFixup |
 | AirDrop / AWDL / Continuity penuh | ❌ Tidak andal | AirPortRTW belum menyediakan dukungan AWDL/Continuity yang siap dipakai harian |
 | Audio | ✅ Bekerja | AppleALC setelah NootedRed, layout-id 55 |
@@ -97,7 +97,7 @@ Komponen:
 
 | Peran | Komponen |
 |---|---|
-| Driver Wi-Fi | `AirPortRTW.kext` 1.0.1 (JoMei9019-real) |
+| Driver Wi-Fi | `AirPortRTW.kext` 1.0.2 (JoMei9019-real) |
 | Compatibility stack | `AMFIPass.kext`, `IOSkywalkFamily.kext`, `IO80211FamilyLegacy.kext` |
 | Fallback disabled | `AirPort_RTW88.kext` 2.0.0, FeiXiao `rtw88.kext` 1.0.1 + Starskiff |
 | Firmware Bluetooth | `RealtekBluetoothFirmware.kext` |
@@ -151,7 +151,7 @@ Sesuaikan nama volume target. Script sebaiknya dijalankan dari Recovery.
 | AppleALC | 1.9.7 |
 | RestrictEvents | 1.1.6 |
 | RealtekRTL8111 | 3.0.0 |
-| AirPortRTW | 1.0.1 |
+| AirPortRTW | 1.0.2 |
 | AirPort_RTW88 | 2.0.0 (fallback disabled) |
 | AMFIPass | 1.4.1 |
 | IO80211FamilyLegacy | 12.0 |

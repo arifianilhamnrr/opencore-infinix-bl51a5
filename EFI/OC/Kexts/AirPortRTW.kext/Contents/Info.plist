@@ -15,13 +15,13 @@
 	<key>CFBundleDisplayName</key>
 	<string>AirPortRTW for RTL88xx</string>
 	<key>CFBundleGetInfoString</key>
-	<string>AirPortRTW 1.0.1 — Feixiao-derived native RTL88xx PCIe Wi-Fi driver</string>
+	<string>AirPortRTW 1.0.2 — experimental RTL8814AE, link-event ABI and sleep/wake fixes</string>
 	<key>CFBundlePackageType</key>
 	<string>KEXT</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0.1</string>
+	<string>1.0.2</string>
 	<key>CFBundleVersion</key>
-	<string>1.0.1</string>
+	<string>1.0.2</string>
 	<key>CFBundleSupportedPlatforms</key>
 	<array>
 		<string>MacOSX</string>
@@ -33,7 +33,7 @@
 	<key>NSHumanReadableCopyright</key>
 	<string>GPL-2.0 OR BSD-3-Clause</string>
 	<key>OSBundleCompatibleVersion</key>
-	<string>1.0.1</string>
+	<string>1.0.2</string>
 	<key>OSBundleRequired</key>
 	<string>Network-Root</string>
 	<key>OSBundleLibraries</key>
@@ -59,6 +59,21 @@
 	</dict>
 	<key>IOKitPersonalities</key>
 	<dict>
+		<key>AirPortRTW_8814AE</key>
+		<dict>
+			<key>CFBundleIdentifier</key>
+			<string>io.github.jomei9019.AirPortRTW</string>
+			<key>IOClass</key>
+			<string>AirPortRTW</string>
+			<key>IOMatchCategory</key>
+			<string>IODefaultMatchCategory</string>
+			<key>IOProbeScore</key>
+			<integer>5000</integer>
+			<key>IOProviderClass</key>
+			<string>IOPCIDevice</string>
+			<key>IOPCIMatch</key>
+			<string>0x881310EC</string>
+		</dict>
 		<key>AirPortRTW_8822BE</key>
 		<dict>
 			<key>CFBundleIdentifier</key>
