@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleGetInfoString</key>
-	<string>Copyright (C) 2013 AnV Software</string>
+	<string>Infinix Display Override</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.AnV.Software.driver.AppleMonitor</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -20,20 +20,20 @@
 	<string>9.9.9</string>
 	<key>IOKitPersonalities</key>
 	<dict>
-		<key>Monitor Apple ID Injection</key>
+		<key>Monitor Infinix Display Injection</key>
 		<dict>
 			<key>CFBundleIdentifier</key>
-			<string>com.apple.driver.AppleUSBMergeNub</string>
+			<string>com.apple.driver.AppleUSBHostMergeProperties</string>
+			<key>IOClass</key>
+			<string>AppleUSBHostMergeProperties</string>
+			<key>IOProviderClass</key>
+			<string>AppleBacklightDisplay</string>
+			<key>IOProbeScore</key>
+			<integer>5000</integer>
 			<key>DisplayProductID</key>
 			<integer>15611</integer>
 			<key>DisplayVendorID</key>
 			<integer>8547</integer>
-			<key>IOClass</key>
-			<string>AppleUSBMergeNub</string>
-			<key>IOProbeScore</key>
-			<integer>5000</integer>
-			<key>IOProviderClass</key>
-			<string>AppleBacklightDisplay</string>
 			<key>IOProviderMergeProperties</key>
 			<dict>
 				<key>AppleDisplayType</key>
@@ -43,17 +43,11 @@
 				<key>DisplayParameterHandlerUsesCharPtr</key>
 				<true/>
 				<key>DisplayProductID</key>
-				<integer>45061</integer>
+				<integer>15611</integer>
 				<key>DisplayProductName</key>
-				<string>Unknown Display</string>
+				<string>Infinix Display</string>
 				<key>DisplayVendorID</key>
-				<integer>1552</integer>
-				<key>IODisplayCapabilityString</key>
-				<data>
-				KHByb3QoYmFja2xpZ2h0KSB0eXBlKGxlZCkgbW9kZWwo
-				aU1hYykgdmNwKDAyIDEwIDUyIDhEIEM4IEM5IERFIERG
-				IEZDIEZEIEZFKSBtY2NzX3ZlcigyLjIpKQ==
-				</data>
+				<integer>8547</integer>
 				<key>IODisplayConnectFlags</key>
 				<data>
 				hEkAAA==
@@ -64,21 +58,11 @@
 				</data>
 				<key>IODisplayEDID</key>
 				<data>
-				AP///////wAGEAWwAAAAABwWAQS1MBt4Im+xp1VMniUM
+				AP///////wAhY/s8AAAAAAAiAQSlIhN4A2jQk1hWkycb
 				UFQAAAABAQEBAQEBAQEBAQEBAQEBmTuAEHE4UEAwIDYA
-				WMIQAAAZAAAA/ABpTWFjCiAgICAgICAgAAAAAAAAAAAA
-				AAAAAAAAAAAAAAAAAgAMPf8MPH0UJyh9AAAAAKo=
+				WMIQAAAZAAAAAAAAAAAAAAAAWMIQAAAZAAAA/ABJbmZp
+				bml4IDE1CiAgAAAAAgAMPf8MPH0UJyh9AAAAAJQ=
 				</data>
-				<key>IODisplayFirmwareLevel</key>
-				<data>
-				AAACBA==
-				</data>
-				<key>IODisplayMCCSVersion</key>
-				<data>
-				AAICAA==
-				</data>
-				<key>IODisplayPrefsKey</key>
-				<string>IOService:/AppleACPIPlatformExpert/PCI0@0/AppleACPIPCI/GP17@8,1/IOPP/AppleBacklightDisplay-610-b005</string>
 				<key>scale-resolutions</key>
 				<array>
 					<data>
@@ -153,6 +137,15 @@
 				</array>
 			</dict>
 		</dict>
+	</dict>
+	<key>OSBundleLibraries</key>
+	<dict>
+		<key>com.apple.driver.AppleUSBHostMergeProperties</key>
+		<string>1.0</string>
+		<key>com.apple.kpi.iokit</key>
+		<string>18.0</string>
+		<key>com.apple.kpi.libkern</key>
+		<string>18.0</string>
 	</dict>
 	<key>OSBundleRequired</key>
 	<string>Root</string>
