@@ -46,7 +46,7 @@ Snapshot ini menyertakan Legacy IO80211 stack Sonoma untuk AirPortRTW. Jangan me
 | CPU 8C/16T | ✅ Bekerja | Kernel patch AMD + ForgedInvariant |
 | CPU power management | ✅ Bekerja | AMDRyzenCPUPowerManagement, SMCAMDProcessor, dan SSDT-CPUR |
 | iGPU Vega 8 + Metal | ⚠️ Bekerja dengan keterbatasan | NootedRed memberi akselerasi; GPU reset atau artifact dapat terjadi pada aplikasi tertentu |
-| Internal display | ✅ Bekerja | Termasuk backlight |
+| Internal display | ✅ Bekerja | Termasuk backlight dan injektor EDID/resolusi Hackintool (Display-2163-3cfb) |
 | Keyboard | ✅ Bekerja | VoodooPS2Controller |
 | Trackpad I2C | ✅ Bekerja | VoodooI2C + VoodooI2CHID; gesture tertentu dapat berbeda |
 | Brightness keys | ✅ Bekerja | BrightnessKeys |
@@ -160,6 +160,7 @@ Sesuaikan nama volume target. Script sebaiknya dijalankan dari Recovery.
 | VoodooI2C | 2.9.1 |
 | VoodooPS2Controller | 2.3.7 |
 | AMDRyzenCPUPowerManagement | 0.7.2 |
+| Display-2163-3cfb | Injector |
 
 NootedRed harus dimuat **sebelum AppleALC**. Satu instance VoodooInput dari VoodooI2C digunakan; plugin VoodooInput, Mouse, dan Trackpad milik VoodooPS2 dinonaktifkan untuk menghindari konflik.
 

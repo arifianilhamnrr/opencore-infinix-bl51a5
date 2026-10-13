@@ -15,3 +15,4 @@ Local edits:
 - RealtekBluetoothFirmware Info.plist: personality 0bda:c821
 - NootedRed 0.8.10 — active Sonoma snapshot
 - AirPortRTW 1.0.2 (JoMei9019-real/AirPort-RTW): native IO80211 Wi-Fi driver with output queue gating, AWDL power fencing, and sleep/wake shutdown ordering fixes
+- Display-2163-3cfb.kext: Hackintool generated display EDID and HiDPI scaling injector for internal panel
