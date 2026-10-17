@@ -2,7 +2,7 @@ Updated: 2026-10-10 from the active EFI on Infinix BL51A5
 Tested profile: BL51A5 + macOS Sonoma 14.8.9 (direct); Tahoe 26.5 and Sequoia 15.7 (previous)
 Recovery: Sequoia BaseSystem.dmg on OC-ESP
 
-Wi-Fi: AirPortRTW 1.0.2 (JoMei9019-real/AirPort-RTW) + Sonoma Legacy IO80211 stack; verified working with ~40-50+ Mbps downlink/uplink; AirPort_RTW88 and rtw88 kept disabled as fallbacks
+Wi-Fi: AirPortRTW 1.0.1 (JoMei9019-real/AirPort-RTW) + Sonoma Legacy IO80211 stack; verified working with ~40-50+ Mbps downlink/uplink; AirPort_RTW88 and rtw88 kept disabled as fallbacks. Rolled back from 1.0.2 due to a scan-engine hang regression on RTL8821CE
 NootedRed fix script: Extras/fix-nootedred.sh
 
 Local edits:
@@ -14,5 +14,5 @@ Local edits:
 - ACPI: includes SSDT-CPUR + CPUR table deletion for the Ryzen 7 5825U
 - RealtekBluetoothFirmware Info.plist: personality 0bda:c821
 - NootedRed 0.8.10 — active Sonoma snapshot
-- AirPortRTW 1.0.2 (JoMei9019-real/AirPort-RTW): native IO80211 Wi-Fi driver with output queue gating, AWDL power fencing, and sleep/wake shutdown ordering fixes
+- AirPortRTW 1.0.1 (JoMei9019-real/AirPort-RTW): native IO80211 Wi-Fi driver. Chosen over 1.0.2 because 1.0.2 introduced a scan-engine hang (Apple80211Scan err 16 EBUSY) on RTL8821CE where a Wi-Fi off/on toggle no longer recovers the interface
 - Display-2163-3cfb.kext: Hackintool generated display EDID and HiDPI scaling injector for internal panel
