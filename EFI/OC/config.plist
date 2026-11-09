@@ -580,7 +580,7 @@
 				<key>BundlePath</key>
 				<string>NootedRed.kext</string>
 				<key>Comment</key>
-				<string>NootedRed 0.8.10 RELEASE - AMD iGPU (BEFORE AppleALC)</string>
+				<string>NootedRed 0.9.0 (steve12311 fork pre-release.15) - AMD iGPU (BEFORE AppleALC)</string>
 				<key>Enabled</key>
 				<true/>
 				<key>ExecutablePath</key>
@@ -598,7 +598,7 @@
 				<key>BundlePath</key>
 				<string>AppleALC.kext</string>
 				<key>Comment</key>
-				<string>AppleALC 1.9.7 - audio (AFTER NootedRed)</string>
+				<string>AppleALC 1.9.8 - audio (AFTER NootedRed)</string>
 				<key>Enabled</key>
 				<true/>
 				<key>ExecutablePath</key>
@@ -2432,7 +2432,7 @@
 				AAAAAAAAAAAAAAAAAAA=
 				</data>
 				<key>boot-args</key>
-				<string>revcpu=1 -NRedDPDelay sonoma-installer=1 -amfipassbeta</string>
+				<string>revcpu=1 -NRedDPDelay -amfipassbeta -NRedDisplayFix -NRedVideoFix</string>
 				<key>csr-active-config</key>
 				<data>
 				AwgAAA==
@@ -2621,12 +2621,12 @@
 				<string>OpenHfsPlus.efi</string>
 				<key>Enabled</key>
 				<true/>
+				<key>HideVerbose</key>
+				<false/>
 				<key>LoadEarly</key>
 				<false/>
 				<key>Path</key>
 				<string>OpenHfsPlus.efi</string>
-				<key>HideVerbose</key>
-				<false/>
 			</dict>
 			<dict>
 				<key>Arguments</key>
@@ -2635,12 +2635,12 @@
 				<string>OpenRuntime.efi</string>
 				<key>Enabled</key>
 				<true/>
+				<key>HideVerbose</key>
+				<false/>
 				<key>LoadEarly</key>
 				<false/>
 				<key>Path</key>
 				<string>OpenRuntime.efi</string>
-				<key>HideVerbose</key>
-				<false/>
 			</dict>
 			<dict>
 				<key>Arguments</key>
@@ -2649,12 +2649,12 @@
 				<string>ResetNvramEntry.efi</string>
 				<key>Enabled</key>
 				<true/>
+				<key>HideVerbose</key>
+				<false/>
 				<key>LoadEarly</key>
 				<false/>
 				<key>Path</key>
 				<string>ResetNvramEntry.efi</string>
-				<key>HideVerbose</key>
-				<false/>
 			</dict>
 			<dict>
 				<key>Arguments</key>
@@ -2663,12 +2663,12 @@
 				<string>OpenCanopy.efi</string>
 				<key>Enabled</key>
 				<true/>
+				<key>HideVerbose</key>
+				<false/>
 				<key>LoadEarly</key>
 				<false/>
 				<key>Path</key>
 				<string>OpenCanopy.efi</string>
-				<key>HideVerbose</key>
-				<false/>
 			</dict>
 		</array>
 		<key>Input</key>

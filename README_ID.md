@@ -53,8 +53,8 @@ Snapshot ini menyertakan Legacy IO80211 stack Sonoma untuk AirPortRTW. Jangan me
 | Battery status | ✅ Bekerja | SMCBatteryManager |
 | NVMe | ✅ Bekerja | NVMeFix aktif |
 | Ethernet | ✅ Driver aktif | RealtekRTL8111 |
-| Wi-Fi RTL8821CE | ✅ Bekerja | UI Wi-Fi native melalui AirPortRTW 1.0.1 (JoMei9019-real); throughput 40–50+ Mbps terverifikasi di Sonoma 14.8.9 |
-| Recovery Wi-Fi | ✅ Stabil | AirPortRTW 1.0.1 tersambung kembali cukup dengan toggle Wi-Fi off/on; 1.0.2 di-rollback karena regresi scan-engine hang pada RTL8821CE |
+| Wi-Fi RTL8821CE | ✅ Bekerja | UI Wi-Fi native melalui AirPortRTW 1.2.0 (JoMei9019-real); WPA2/WPA3-Personal, auto-roaming, dan hardware CCMP |
+| Recovery Wi-Fi | ✅ Stabil | AirPortRTW 1.2.0 tersambung kembali cukup dengan toggle Wi-Fi off/on |
 | Bluetooth Realtek | ✅ Bekerja pada unit pengujian | RealtekBluetoothFirmware + BlueToolFixup |
 | AirDrop / AWDL / Continuity penuh | ❌ Tidak andal | AirPortRTW belum menyediakan dukungan AWDL/Continuity yang siap dipakai harian |
 | Audio | ✅ Bekerja | AppleALC setelah NootedRed, layout-id 55 |
@@ -63,7 +63,7 @@ Snapshot ini menyertakan Legacy IO80211 stack Sonoma untuk AirPortRTW. Jangan me
 
 ## Batasan grafis NootedRed
 
-EFI ini sekarang memakai **NootedRed 0.8.10**, sesuai EFI Sonoma aktif. Akselerasi grafis bekerja pada unit pengujian, tetapi keterbatasan NootedRed tetap dapat berbeda tergantung versi macOS dan beban kerja.
+EFI ini sekarang memakai **NootedRed 0.9.0 (steve12311 fork pre-release.15)** dengan boot argument `-NRedDisplayFix -NRedVideoFix` untuk meningkatkan stabilitas iGPU AMD Renoir/Cezanne. Akselerasi grafis bekerja pada unit pengujian, tetapi keterbatasan NootedRed tetap dapat berbeda tergantung versi macOS dan beban kerja.
 
 Gejala pada build sebelumnya yang pernah terkonfirmasi melalui laporan `.gpuRestart`:
 
@@ -84,10 +84,12 @@ Workaround harian:
 Boot arguments snapshot ini:
 
 ```text
-revcpu=1 -NRedDPDelay
+revcpu=1 -NRedDPDelay -amfipassbeta -NRedDisplayFix -NRedVideoFix
 ```
 
-`unfairgva=1` sudah dihapus setelah pengujian karena tidak memperbaiki masalah video dan GPU reset.
+- `-NRedDisplayFix -NRedVideoFix`: Mitigasi freeze layar dan pemutaran video pada NootedRed 0.9.0.
+- `-amfipassbeta`: Memastikan kompatibilitas AMFI pass-through untuk legacy Wi-Fi stack pada versi macOS terbaru.
+- `-NRedDPDelay`: Mengatasi delay display port timing pada panel internal.
 
 ## Wi-Fi dan Bluetooth
 
@@ -97,9 +99,9 @@ Komponen:
 
 | Peran | Komponen |
 |---|---|
-| Driver Wi-Fi | `AirPortRTW.kext` 1.0.1 (JoMei9019-real) |
+| Driver Wi-Fi | `AirPortRTW.kext` 1.2.0 (JoMei9019-real) |
 | Compatibility stack | `AMFIPass.kext`, `IOSkywalkFamily.kext`, `IO80211FamilyLegacy.kext` |
-| Fallback disabled | `AirPort_RTW88.kext` 2.0.0, FeiXiao `rtw88.kext` 1.0.1 + Starskiff |
+| Fallback disabled | `AirPort_RTW88.kext` 2.0.1, FeiXiao `rtw88.kext` 1.0.1 + Starskiff |
 | Firmware Bluetooth | `RealtekBluetoothFirmware.kext` |
 | Patch Bluetooth Monterey+ | `BlueToolFixup.kext` |
 
@@ -145,14 +147,14 @@ Sesuaikan nama volume target. Script sebaiknya dijalankan dari Recovery.
 
 | Komponen | Versi |
 |---|---|
-| NootedRed | 0.8.10 |
+| NootedRed | 0.9.0 (steve12311 fork pre-release.15) |
 | Lilu | 1.7.2 |
 | VirtualSMC | 1.3.7 |
-| AppleALC | 1.9.7 |
+| AppleALC | 1.9.8 |
 | RestrictEvents | 1.1.6 |
 | RealtekRTL8111 | 3.0.0 |
-| AirPortRTW | 1.0.1 |
-| AirPort_RTW88 | 2.0.0 (fallback disabled) |
+| AirPortRTW | 1.2.0 |
+| AirPort_RTW88 | 2.0.1 (fallback disabled) |
 | AMFIPass | 1.4.1 |
 | IO80211FamilyLegacy | 12.0 |
 | IOSkywalkFamily | 1.0 |
@@ -189,7 +191,7 @@ File backup/debug dari EFI harian sengaja tidak ikut dimasukkan.
 ## Sumber dan kredit
 
 - [OpenCorePkg](https://github.com/acidanthera/OpenCorePkg)
-- [NootedRed](https://github.com/ChefKissInc/NootedRed)
+- [NootedRed (ChefKissInc)](https://github.com/ChefKissInc/NootedRed) / [steve12311 fork](https://github.com/steve12311/NootedRed)
 - [AMD Vanilla](https://github.com/AMD-OSX/AMD_Vanilla)
 - [VoodooI2C](https://github.com/VoodooI2C/VoodooI2C)
 - Airport_RTW88, FeiXiao/rtw88, Starskiff, dan RealtekBluetoothFirmware
