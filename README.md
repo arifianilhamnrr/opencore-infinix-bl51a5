@@ -4,21 +4,21 @@
 
 OpenCore EFI for the **Infinix XBOOK 15 BL51A5**, powered by an AMD Ryzen 7 5825U and Radeon Vega 8 integrated graphics.
 
-This snapshot was exported from the active EFI on **October 4, 2026** and targets **macOS Sonoma 14.8.9 (23J631)**.
+This snapshot was exported from the active EFI on **November 9, 2026** and targets **macOS Tahoe 26.7.1 (25G241)**.
 
-![macOS Sonoma 14.8.9 Wi-Fi and network throughput on the Infinix XBOOK 15 BL51A5](docs/images/sonoma-14.8-wifi-speedtest.png)
+![macOS Tahoe installation on the Infinix XBOOK 15 BL51A5](docs/images/tahoe-26.5-about.png)
 
-![Earlier macOS Tahoe installation on the Infinix XBOOK 15 BL51A5](docs/images/tahoe-26.5-about.png)
+![Previous macOS Sonoma 14.8.9 Wi-Fi and network throughput on the Infinix XBOOK 15 BL51A5](docs/images/sonoma-14.8-wifi-speedtest.png)
 
 ## macOS support
 
 | Version | Status | Notes |
 |---|---|---|
-| macOS Sonoma 14.8.9 | ✅ Directly tested | Primary target of this snapshot |
-| macOS Tahoe 26.5 | ✅ Previously tested | Previous repository snapshot used FeiXiao `rtw88` + Starskiff |
+| macOS Tahoe 26.7.1 | ✅ Directly tested | Primary target of this snapshot (Darwin 25.6.0) |
+| macOS Sonoma 14.8.9 | ✅ Previously tested | Verified working with native Wi-Fi legacy stack |
 | macOS Sequoia 15.7 | ✅ Previously tested | Back up the EFI before switching versions |
 
-This snapshot contains the Sonoma Legacy IO80211 stack for AirPortRTW. Do not assume that the same Wi-Fi configuration is suitable for newer macOS releases without testing from a USB EFI first.
+This snapshot contains the Legacy IO80211 stack (AMFIPass + IOSkywalkFamily + IO80211FamilyLegacy) for AirPortRTW on macOS Sonoma, Sequoia, and Tahoe. Always test from a USB EFI first when updating macOS.
 
 ## Hardware
 
@@ -42,7 +42,7 @@ This snapshot contains the Sonoma Legacy IO80211 stack for AirPortRTW. Do not as
 
 | Feature | Status | Notes |
 |---|---|---|
-| OpenCore picker and macOS boot | ✅ Working | Sonoma 14.8.9 tested as the primary system |
+| OpenCore picker and macOS boot | ✅ Working | macOS Tahoe 26.7.1 directly tested as the primary system |
 | CPU 8C/16T | ✅ Working | AMD kernel patches + ForgedInvariant |
 | CPU power management | ✅ Working | AMDRyzenCPUPowerManagement, SMCAMDProcessor, and SSDT-CPUR |
 | Vega 8 iGPU + Metal | ⚠️ Working with limitations | NootedRed provides acceleration; GPU resets or artifacts may occur in some applications |
@@ -93,7 +93,7 @@ revcpu=1 -NRedDPDelay -amfipassbeta -NRedDisplayFix -NRedVideoFix
 
 ## Wi-Fi and Bluetooth
 
-On Sonoma, this snapshot uses AirPortRTW (JoMei9019-real) with the Legacy IO80211 stack so RTL8821CE appears in Apple's native Wi-Fi interface. `AirPort_RTW88.kext` and the older FeiXiao `rtw88.kext` remain in the EFI as disabled fallbacks and must not be enabled at the same time.
+This snapshot uses AirPortRTW 1.2.0 (JoMei9019-real) with the restored Legacy IO80211 stack so RTL8821CE appears in Apple's native Wi-Fi interface on Sonoma, Sequoia, and Tahoe. `AirPort_RTW88.kext` (v2.0.1) and the older FeiXiao `rtw88.kext` remain in the EFI as disabled fallbacks and must not be enabled at the same time.
 
 Components:
 

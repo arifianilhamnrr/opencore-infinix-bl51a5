@@ -1,12 +1,12 @@
 Updated: 2026-11-09 from the active EFI on Infinix BL51A5
-Tested profile: BL51A5 + macOS Sonoma 14.8.9 (direct); Tahoe 26.5 and Sequoia 15.7 (previous)
+Tested profile: BL51A5 + macOS Tahoe 26.7.1 (25G241 / Darwin 25.6.0, direct); Sonoma 14.8.9 and Sequoia 15.7 (previous)
 Recovery: Sequoia BaseSystem.dmg on OC-ESP
 
-Wi-Fi: AirPortRTW 1.2.0 (JoMei9019-real/AirPort-RTW) + Legacy IO80211 stack; verified working with WPA2/WPA3-Personal, auto-roaming, and hardware CCMP; AirPort_RTW88 2.0.1 and rtw88 kept disabled as fallbacks.
+Wi-Fi: AirPortRTW 1.2.0 (JoMei9019-real/AirPort-RTW) + Legacy IO80211 stack (AMFIPass 1.4.1 + IOSkywalkFamily + IO80211FamilyLegacy); verified working on Tahoe 26.7.1 with WPA2/WPA3-Personal, auto-roaming, and hardware CCMP; AirPort_RTW88 2.0.1 and rtw88 kept disabled as fallbacks.
 NootedRed fix script: Extras/fix-nootedred.sh
 
 Local edits:
-- Config: Sonoma snapshot + AMD 8-core kernel patches + Realtek BT/Wi-Fi
+- Config: OpenCore 1.0.8 + AMD 8-core kernel patches + Realtek BT/Wi-Fi
 - SMBIOS: MacBookPro16,2 — see SMBIOS.txt
 - boot-args default: revcpu=1 -NRedDPDelay -amfipassbeta -NRedDisplayFix -NRedVideoFix
 - RealtekRTL8111.kext v3.0.0 — active Sonoma snapshot

@@ -4,21 +4,21 @@
 
 OpenCore EFI untuk **Infinix XBOOK 15 BL51A5** dengan AMD Ryzen 7 5825U dan iGPU Radeon Vega 8.
 
-Snapshot ini diekspor dari EFI aktif pada **4 Oktober 2026** dan ditujukan untuk **macOS Sonoma 14.8.9 (23J631)**.
+Snapshot ini diekspor dari EFI aktif pada **9 November 2026** dan ditujukan untuk **macOS Tahoe 26.7.1 (25G241)**.
 
-![macOS Sonoma 14.8.9 Wi-Fi dan throughput jaringan pada Infinix XBOOK 15 BL51A5](docs/images/sonoma-14.8-wifi-speedtest.png)
+![Instalasi macOS Tahoe pada Infinix XBOOK 15 BL51A5](docs/images/tahoe-26.5-about.png)
 
-![Instalasi macOS Tahoe sebelumnya pada Infinix XBOOK 15 BL51A5](docs/images/tahoe-26.5-about.png)
+![Throughput jaringan dan Wi-Fi macOS Sonoma 14.8.9 sebelumnya pada Infinix XBOOK 15 BL51A5](docs/images/sonoma-14.8-wifi-speedtest.png)
 
 ## Dukungan macOS
 
 | Versi | Status | Catatan |
 |---|---|---|
-| macOS Sonoma 14.8.9 | ✅ Diuji langsung | Target utama snapshot ini |
-| macOS Tahoe 26.5 | ✅ Pernah diuji | Snapshot repo sebelumnya memakai FeiXiao `rtw88` + Starskiff |
+| macOS Tahoe 26.7.1 | ✅ Diuji langsung | Target utama snapshot ini (Darwin 25.6.0) |
+| macOS Sonoma 14.8.9 | ✅ Pernah diuji | Terverifikasi bekerja dengan legacy stack Wi-Fi |
 | macOS Sequoia 15.7 | ✅ Pernah diuji | Backup EFI sebelum berpindah versi |
 
-Snapshot ini menyertakan Legacy IO80211 stack Sonoma untuk AirPortRTW. Jangan menganggap konfigurasi Wi-Fi yang sama cocok untuk macOS lebih baru tanpa mengujinya dari USB EFI terlebih dahulu.
+Snapshot ini menyertakan Legacy IO80211 stack (AMFIPass + IOSkywalkFamily + IO80211FamilyLegacy) untuk AirPortRTW pada macOS Sonoma, Sequoia, dan Tahoe. Jangan menganggap konfigurasi Wi-Fi yang sama cocok untuk macOS lebih baru tanpa mengujinya dari USB EFI terlebih dahulu.
 
 ## Hardware
 
@@ -42,7 +42,7 @@ Snapshot ini menyertakan Legacy IO80211 stack Sonoma untuk AirPortRTW. Jangan me
 
 | Fitur | Status | Catatan |
 |---|---|---|
-| OpenCore picker dan boot macOS | ✅ Bekerja | Sonoma 14.8.9 diuji sebagai sistem utama |
+| OpenCore picker dan boot macOS | ✅ Bekerja | macOS Tahoe 26.7.1 diuji langsung sebagai sistem utama |
 | CPU 8C/16T | ✅ Bekerja | Kernel patch AMD + ForgedInvariant |
 | CPU power management | ✅ Bekerja | AMDRyzenCPUPowerManagement, SMCAMDProcessor, dan SSDT-CPUR |
 | iGPU Vega 8 + Metal | ⚠️ Bekerja dengan keterbatasan | NootedRed memberi akselerasi; GPU reset atau artifact dapat terjadi pada aplikasi tertentu |
@@ -93,7 +93,7 @@ revcpu=1 -NRedDPDelay -amfipassbeta -NRedDisplayFix -NRedVideoFix
 
 ## Wi-Fi dan Bluetooth
 
-Pada Sonoma, snapshot ini memakai AirPortRTW (JoMei9019-real) bersama Legacy IO80211 stack sehingga RTL8821CE tampil di UI Wi-Fi native Apple. `AirPort_RTW88.kext` dan `rtw88.kext` FeiXiao lama tetap disimpan sebagai fallback dalam keadaan disabled dan tidak boleh diaktifkan bersamaan.
+Snapshot ini memakai AirPortRTW 1.2.0 (JoMei9019-real) bersama Legacy IO80211 stack sehingga RTL8821CE tampil di UI Wi-Fi native Apple pada Sonoma, Sequoia, dan Tahoe. `AirPort_RTW88.kext` (v2.0.1) dan `rtw88.kext` FeiXiao lama tetap disimpan sebagai fallback dalam keadaan disabled dan tidak boleh diaktifkan bersamaan.
 
 Komponen:
 
