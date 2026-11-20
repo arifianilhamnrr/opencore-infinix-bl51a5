@@ -1,0 +1,36 @@
+Kext inventory after tidy 2026-07-17
+=====================================
+UPDATED:
+  NootedRed              1.0.0 (custom/nightly?)  ->  0.9.0 RELEASE (nightly CI 2026-06-19)
+  Lilu                   1.7.1  ->  1.7.2
+  AppleALC               1.9.5  ->  1.9.7
+  ForgedInvariant        1.2.0  ->  1.5.0
+  SMCRadeonSensors       2.3.0  ->  2.4.0
+  BlueToolFixup          2.7.1  ->  2.7.2
+
+UNCHANGED (current):
+  VirtualSMC             1.3.7
+  RestrictEvents         1.1.6
+  NVMeFix                1.1.3
+  BrightnessKeys         1.0.3
+  ECEnabler              1.0.6
+  VoodooI2C              2.9.1
+  VoodooI2CHID           1.0
+  VoodooPS2Controller    2.3.7
+  VoodooSMBus            2.2
+  RealtekRTL8111         3.0.4
+  rtw88                  1.0.1
+  RealtekBluetoothFirmware 1.0.2
+  AMDRyzenCPUPowerManagement 0.7.2
+  SMCAMDProcessor        1.0.1
+  SMCBatteryManager      1.3.7
+  SMCLightSensor         1.3.7
+  AppleMCEReporterDisabler 1.2
+
+DISABLED in Config (cleanup):
+  VoodooPS2 VoodooInput   (duplicate of I2C VoodooInput)
+  VoodooPS2Mouse          (I2C touchpad)
+  VoodooPS2Trackpad       (I2C touchpad)
+
+ORDER RULE: NootedRed BEFORE AppleALC (ChefKiss #422)
+Backup: EFI/OC/Backup/kext-tidy-*/
