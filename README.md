@@ -46,8 +46,8 @@ This snapshot contains the Legacy IO80211 stack (AMFIPass + IOSkywalkFamily + IO
 | Direct boot to macOS | ✅ Working | Picker is hidden; hold **Esc** at boot to open it for rescue tools |
 | CPU 8C/16T | ✅ Working | AMD kernel patches + ForgedInvariant |
 | CPU power management | ✅ Working | AMDRyzenCPUPowerManagement, SMCAMDProcessor, and SSDT-CPUR |
-| Vega 8 iGPU + Metal | ✅ Working | NootedRed 1.2.7 (weachy fork); smooth video playback in Safari and browsers |
-| HDMI / DisplayPort audio | ⚠️ Unverified | Redesigned in 1.2.7; no external display available to test on this unit |
+| Vega 8 iGPU + Metal | ✅ Working | NootedRed 1.3.0 (weachy fork); smooth video playback in Safari and browsers |
+| HDMI / DisplayPort audio | ⚠️ Unverified | Redesigned in 1.3.0; no external display available to test on this unit |
 | Internal display | ✅ Working | Includes backlight control and Hackintool EDID/scale injector (Display-2163-3cfb) |
 | Keyboard | ✅ Working | VoodooPS2Controller |
 | I2C trackpad | ✅ Working | VoodooI2C + VoodooI2CHID; individual gestures may vary |
@@ -78,9 +78,9 @@ Only APFS and internal NVMe/SATA/PCI devices are scanned. This hides the Linux e
 
 ## NootedRed and AMD notes
 
-This snapshot uses **NootedRed 1.2.7 (weachy fork)**. From v1.2.0 onward GLFix, Metal fixes, OpenCL optimisation, VDA hardware video (AVC + HEVC), and HDMI/DP audio are enabled by default — no opt-in boot arguments are needed. All fixes are opt-out flags such as `-NRedNoVDA`, `-NRedNoGLFix`, and `-NRedDebug`.
+This snapshot uses **NootedRed 1.3.0 (weachy fork)**. From v1.2.0 onward GLFix, Metal fixes, OpenCL optimisation, VDA hardware video (AVC + HEVC), and HDMI/DP audio are enabled by default — no opt-in boot arguments are needed. All fixes are opt-out flags such as `-NRedNoVDA`, `-NRedNoGLFix`, and `-NRedDebug`.
 
-v1.2.7 adds an event-driven `NRedAudio` pipeline that programs the DCN audio registers (Azalia, DCCG, AFMT, DP_SEC) and improves DisplayPort hotplug / monitor power-off recovery. On this unit, Safari and browser video playback is smooth and the system is responsive.
+v1.3.0 adds an event-driven `NRedAudio` pipeline that programs the DCN audio registers (Azalia, DCCG, AFMT, DP_SEC) and improves DisplayPort hotplug / monitor power-off recovery. On this unit, Safari and browser video playback is smooth and the system is responsive.
 
 Daily-use notes:
 
@@ -100,6 +100,7 @@ revcpu=1 -NRedDPDelay -amfipassbeta rhv_enable_svm=1 rhv_allow_users=1 rhv_hv=1 
 - `ipc_control_port_options=0`: compatibility option retained for Docker/HyperKit.
 - `-NRedDPDelay`: workaround for display port timing delays on the internal panel.
 - `revcpu=1`: CPU revision override required by the AMD patches.
+- `-NRedNoVP9`: disables hardware VP9 decoding. v1.3.0 requires SIP to be fully disabled for VP9; this EFI keeps SIP relaxed (`03080000`) for RyzenHV, so VP9 is disabled to avoid `SIGKILL (Code Signature Invalid)` in Hardened Runtime apps. All other v1.3.0 features (AVC/HEVC Main10/8K, Metal, GLFix, low-VRAM optimisations, HDMI/DP audio) remain active.
 
 ## Wi-Fi and Bluetooth
 
@@ -157,7 +158,7 @@ Adjust the target volume name as needed. The script should be run from Recovery.
 
 | Component | Version |
 |---|---|
-| NootedRed (weachy fork) | 1.2.7 |
+| NootedRed (weachy fork) | 1.3.0 |
 | RyzenHV | 0.7.8 + PR#16 fix |
 | Lilu | 1.7.2 |
 | VirtualSMC | 1.3.7 |

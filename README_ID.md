@@ -46,8 +46,8 @@ Snapshot ini menyertakan Legacy IO80211 stack (AMFIPass + IOSkywalkFamily + IO80
 | Boot langsung ke macOS | ✅ Bekerja | Picker disembunyikan; tahan **Esc** saat boot untuk membukanya (rescue tools) |
 | CPU 8C/16T | ✅ Bekerja | Kernel patch AMD + ForgedInvariant |
 | CPU power management | ✅ Bekerja | AMDRyzenCPUPowerManagement, SMCAMDProcessor, dan SSDT-CPUR |
-| iGPU Vega 8 + Metal | ✅ Bekerja | NootedRed 1.2.7 (fork weachy); video Safari/browser berjalan halus |
-| Audio HDMI / DisplayPort | ⚠️ Belum diverifikasi | Didesain ulang di 1.2.7; tidak ada monitor eksternal untuk diuji di unit ini |
+| iGPU Vega 8 + Metal | ✅ Bekerja | NootedRed 1.3.0 (fork weachy); video Safari/browser berjalan halus |
+| Audio HDMI / DisplayPort | ⚠️ Belum diverifikasi | Didesain ulang di 1.3.0; tidak ada monitor eksternal untuk diuji di unit ini |
 | Internal display | ✅ Bekerja | Termasuk backlight dan injektor EDID/resolusi Hackintool (Display-2163-3cfb) |
 | Keyboard | ✅ Bekerja | VoodooPS2Controller |
 | Trackpad I2C | ✅ Bekerja | VoodooI2C + VoodooI2CHID; gesture tertentu dapat berbeda |
@@ -78,9 +78,9 @@ Hanya APFS dan perangkat NVMe/SATA/PCI internal yang dipindai. Ini menyembunyika
 
 ## Catatan NootedRed dan AMD
 
-Snapshot ini memakai **NootedRed 1.2.7 (fork weachy)**. Mulai v1.2.0, GLFix, perbaikan Metal, optimasi OpenCL, VDA hardware video (AVC + HEVC), dan audio HDMI/DP aktif secara default — tidak perlu boot argument khusus. Semua perbaikan bersifat opt-out lewat flag seperti `-NRedNoVDA`, `-NRedNoGLFix`, dan `-NRedDebug`.
+Snapshot ini memakai **NootedRed 1.3.0 (fork weachy)**. Mulai v1.2.0, GLFix, perbaikan Metal, optimasi OpenCL, VDA hardware video (AVC + HEVC), dan audio HDMI/DP aktif secara default — tidak perlu boot argument khusus. Semua perbaikan bersifat opt-out lewat flag seperti `-NRedNoVDA`, `-NRedNoGLFix`, dan `-NRedDebug`.
 
-v1.2.7 menambahkan pipeline `NRedAudio` berbasis event yang memprogram register audio DCN (Azalia, DCCG, AFMT, DP_SEC) serta perbaikan hotplug DisplayPort dan recovery saat monitor dimatikan. Di unit ini, pemutaran video di Safari/browser berjalan halus dan sistem terasa responsif.
+v1.3.0 menambahkan pipeline `NRedAudio` berbasis event yang memprogram register audio DCN (Azalia, DCCG, AFMT, DP_SEC) serta perbaikan hotplug DisplayPort dan recovery saat monitor dimatikan. Di unit ini, pemutaran video di Safari/browser berjalan halus dan sistem terasa responsif.
 
 Catatan harian:
 
@@ -100,6 +100,7 @@ revcpu=1 -NRedDPDelay -amfipassbeta rhv_enable_svm=1 rhv_allow_users=1 rhv_hv=1 
 - `ipc_control_port_options=0`: opsi kompatibilitas yang tetap dipakai untuk Docker/HyperKit.
 - `-NRedDPDelay`: mengatasi delay display port timing pada panel internal.
 - `revcpu=1`: override revisi CPU yang dibutuhkan patch AMD.
+- `-NRedNoVP9`: mematikan decoding VP9 hardware. v1.3.0 mensyaratkan SIP benar-benar mati untuk VP9; EFI ini menjaga SIP relaxed (`03080000`) untuk RyzenHV, maka VP9 dimatikan agar aplikasi Hardened Runtime tidak `SIGKILL (Code Signature Invalid)`. Fitur lain v1.3.0 (AVC/HEVC Main10/8K, Metal, GLFix, optimasi VRAM rendah, audio HDMI/DP) tetap aktif.
 
 ## Wi-Fi dan Bluetooth
 
@@ -157,7 +158,7 @@ Sesuaikan nama volume target. Script sebaiknya dijalankan dari Recovery.
 
 | Komponen | Versi |
 |---|---|
-| NootedRed (fork weachy) | 1.2.7 |
+| NootedRed (fork weachy) | 1.3.0 |
 | RyzenHV | 0.7.8 + perbaikan PR#16 |
 | Lilu | 1.7.2 |
 | VirtualSMC | 1.3.7 |
