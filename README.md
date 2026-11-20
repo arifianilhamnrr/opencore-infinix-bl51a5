@@ -4,7 +4,7 @@
 
 OpenCore EFI for the **Infinix XBOOK 15 BL51A5**, powered by an AMD Ryzen 7 5825U and Radeon Vega 8 integrated graphics.
 
-This snapshot was exported from the active EFI on **November 9, 2026** and targets **macOS Tahoe 26.7.1 (25G241)**.
+This snapshot was exported from the active EFI on **November 20, 2026** and targets **macOS Tahoe 26.7.1 (25G241)**.
 
 ![macOS Tahoe installation on the Infinix XBOOK 15 BL51A5](docs/images/tahoe-26.5-about.png)
 
@@ -30,11 +30,12 @@ This snapshot contains the Legacy IO80211 stack (AMFIPass + IOSkywalkFamily + IO
 | CPU | AMD Ryzen 7 5825U, 8 cores / 16 threads |
 | iGPU | AMD Radeon Vega 8 / Barcelo, `1002:15e7` |
 | Tested memory | 16 GB DDR4-3200 |
+| UMA frame buffer | 2 GB (shared VRAM; carveout reported as 2 GB by the driver) |
 | Storage | NVMe SSD |
 | Wi-Fi | Realtek RTL8821CE PCIe, `10ec:c821` |
 | Bluetooth | Realtek RTL8821C USB, `0bda:c821` |
 | Ethernet | Realtek RTL8111/8168 |
-| Audio | Realtek ALC269VC, layout-id 55 |
+| Audio | Realtek ALC269VC, layout-id 55 with a custom pin patch (see below) |
 | Trackpad | I2C HID through VoodooI2C/VoodooI2CHID |
 | SMBIOS | MacBookPro16,2 |
 
@@ -42,10 +43,11 @@ This snapshot contains the Legacy IO80211 stack (AMFIPass + IOSkywalkFamily + IO
 
 | Feature | Status | Notes |
 |---|---|---|
-| OpenCore picker and macOS boot | ✅ Working | macOS Tahoe 26.7.1 directly tested as the primary system |
+| Direct boot to macOS | ✅ Working | Picker is hidden; hold **Esc** at boot to open it for rescue tools |
 | CPU 8C/16T | ✅ Working | AMD kernel patches + ForgedInvariant |
 | CPU power management | ✅ Working | AMDRyzenCPUPowerManagement, SMCAMDProcessor, and SSDT-CPUR |
-| Vega 8 iGPU + Metal | ⚠️ Working with limitations | NootedRed provides acceleration; GPU resets or artifacts may occur in some applications |
+| Vega 8 iGPU + Metal | ✅ Working | NootedRed 1.2.7 (weachy fork); smooth video playback in Safari and browsers |
+| HDMI / DisplayPort audio | ⚠️ Unverified | Redesigned in 1.2.7; no external display available to test on this unit |
 | Internal display | ✅ Working | Includes backlight control and Hackintool EDID/scale injector (Display-2163-3cfb) |
 | Keyboard | ✅ Working | VoodooPS2Controller |
 | I2C trackpad | ✅ Working | VoodooI2C + VoodooI2CHID; individual gestures may vary |
@@ -53,53 +55,61 @@ This snapshot contains the Legacy IO80211 stack (AMFIPass + IOSkywalkFamily + IO
 | Battery status | ✅ Working | SMCBatteryManager |
 | NVMe | ✅ Working | NVMeFix enabled |
 | Ethernet | ✅ Driver active | RealtekRTL8111 |
-| RTL8821CE Wi-Fi | ✅ Working | Native Wi-Fi UI through AirPortRTW 1.2.0 (JoMei9019-real); WPA2/WPA3-Personal, auto-roaming, and hardware CCMP |
-| Wi-Fi recovery | ✅ Stable | AirPortRTW 1.2.0 reconnects reliably with a simple Wi-Fi off/on toggle |
+| RTL8821CE Wi-Fi | ✅ Working | Native Wi-Fi UI through AirPortRTW 1.3.0 (JoMei9019-real); WPA2/WPA3-Personal, auto-roaming, and hardware CCMP |
+| Wi-Fi recovery | ✅ Stable | AirPortRTW reconnects reliably with a simple Wi-Fi off/on toggle |
 | Realtek Bluetooth | ✅ Working on the tested unit | RealtekBluetoothFirmware + BlueToolFixup |
 | Full AirDrop / AWDL / Continuity | ❌ Not reliable | AirPortRTW does not provide production-ready AWDL/Continuity support |
-| Audio | ✅ Working | AppleALC after NootedRed, layout-id 55 |
+| Internal speakers + mic | ✅ Working | AppleALC 1.9.8, layout-id 55, custom pin `0x1b` changed from JACK to FIXED to disable jack detection |
+| 3.5 mm combo jack | ❌ Not working | Layout 55 has an incompatible jack topology; USB/Bluetooth audio is recommended |
 | Sleep/wake | ✅ Working on the tested unit | Retest after changing the USB map, Bluetooth stack, or macOS version |
-| DRM / protected streaming content | ⚠️ Not guaranteed | `unfairgva=1` was intentionally removed because it did not prevent GPU resets |
+| Docker Desktop | ✅ Working | RyzenHV 0.7.8 + PR#16, HyperKit engine, 12 CPUs / 4096 MiB VM; use `~/ryzenhv-0.7.8/docker-fix-pid.sh --restart` if HyperKit wedges |
+| DRM / protected streaming content | ⚠️ Not guaranteed | Use Chromium-based browsers for Widevine; FairPlay on Safari is limited on AMD Hackintoshes |
 
-## NootedRed graphics limitations
+## Boot behaviour
 
-This EFI currently uses **NootedRed 0.9.0 (steve12311 fork pre-release.15)** with `-NRedDisplayFix -NRedVideoFix` boot arguments for improved stability on AMD Renoir/Cezanne iGPUs. Graphics acceleration works on the tested unit, but NootedRed limitations can still vary by macOS version and workload.
+The boot picker is hidden so the machine boots straight into macOS:
 
-Symptoms previously confirmed on older builds through `.gpuRestart` reports:
+```text
+Misc > Boot > ShowPicker = false
+Misc > Security > ScanPolicy = 17760515 (0x10F0103)
+```
 
-- Safari/WebKit could stutter or reset during video playback.
-- App Store and `mediaanalysisd` could trigger resets in the `VTMTSComputeFunction` shader.
-- Increasing UMA from 512 MB to 1 GB provided more graphics memory but did not solve the driver bug.
+Only APFS and internal NVMe/SATA/PCI devices are scanned. This hides the Linux ext4 partition from the picker so it cannot be selected as the default. **Hold `Esc` at boot** to open the picker when you need `UEFI Shell (rescue)`.
 
-Graphics acceleration is available, but stability depends on the application and macOS build. GPU resets have previously been recorded, and Chromium/Electron applications such as Discord, Spotify, Termius, and Brave may show artifacts while hardware acceleration is enabled.
+## NootedRed and AMD notes
 
-Daily-use workarounds:
+This snapshot uses **NootedRed 1.2.7 (weachy fork)**. From v1.2.0 onward GLFix, Metal fixes, OpenCL optimisation, VDA hardware video (AVC + HEVC), and HDMI/DP audio are enabled by default — no opt-in boot arguments are needed. All fixes are opt-out flags such as `-NRedNoVDA`, `-NRedNoGLFix`, and `-NRedDebug`.
 
-- Launch affected Electron applications with `--disable-gpu`.
-- Disable graphics acceleration in browsers when stability matters more than performance.
-- Use a solid-color wallpaper if dynamic wallpapers trigger resets.
-- Run `Extras/fix-nootedred.sh` after a fresh installation if the desktop or login screen hangs.
-- With 16 GB of RAM, a 2 GB UMA allocation can be used. Choose 1 GB if you prefer to leave more memory available to macOS.
+v1.2.7 adds an event-driven `NRedAudio` pipeline that programs the DCN audio registers (Azalia, DCCG, AFMT, DP_SEC) and improves DisplayPort hotplug / monitor power-off recovery. On this unit, Safari and browser video playback is smooth and the system is responsive.
+
+Daily-use notes:
+
+- NootedRed must load **before AppleALC**.
+- Do not use WhateverGreen or BFixup alongside NootedRed.
+- AMFIPass.kext, `amfi_get_out_of_my_way=0x1`, and `csr-active-config=03080000` are retained because RyzenHV needs relaxed AMFI for HyperKit patching. Do not remove them just because newer NootedRed releases no longer require them.
+- A 2 GB UMA carveout works well with 16 GB of RAM.
 
 Snapshot boot arguments:
 
 ```text
-revcpu=1 -NRedDPDelay -amfipassbeta -NRedDisplayFix -NRedVideoFix
+revcpu=1 -NRedDPDelay -amfipassbeta rhv_enable_svm=1 rhv_allow_users=1 rhv_hv=1 amfi_get_out_of_my_way=0x1 ipc_control_port_options=0 rhv_selftest=1
 ```
 
-- `-NRedDisplayFix -NRedVideoFix`: Mitigate display and video playback freezes with NootedRed 0.9.0.
-- `-amfipassbeta`: Ensure AMFI pass-through compatibility for the restored legacy Wi-Fi stack across recent macOS builds.
-- `-NRedDPDelay`: Workaround for display port timing delays on internal panels.
+- `rhv_*`: enable RyzenHV native SVM mode, allow non-root users, enable the HyperKit hypervisor, and run its self-test.
+- `amfi_get_out_of_my_way=0x1` + `-amfipassbeta`: relaxed AMFI for in-memory HyperKit patching and the legacy Wi-Fi stack.
+- `ipc_control_port_options=0`: compatibility option retained for Docker/HyperKit.
+- `-NRedDPDelay`: workaround for display port timing delays on the internal panel.
+- `revcpu=1`: CPU revision override required by the AMD patches.
 
 ## Wi-Fi and Bluetooth
 
-This snapshot uses AirPortRTW 1.2.0 (JoMei9019-real) with the restored Legacy IO80211 stack so RTL8821CE appears in Apple's native Wi-Fi interface on Sonoma, Sequoia, and Tahoe. `AirPort_RTW88.kext` (v2.0.1) and the older FeiXiao `rtw88.kext` remain in the EFI as disabled fallbacks and must not be enabled at the same time.
+This snapshot uses AirPortRTW 1.3.0 (JoMei9019-real) with the restored Legacy IO80211 stack so RTL8821CE appears in Apple's native Wi-Fi interface on Sonoma, Sequoia, and Tahoe. `AirPort_RTW88.kext` (v2.0.1) and the older FeiXiao `rtw88.kext` remain in the EFI as disabled fallbacks and must not be enabled at the same time.
 
 Components:
 
 | Role | Component |
 |---|---|
-| Wi-Fi driver | `AirPortRTW.kext` 1.2.0 (JoMei9019-real) |
+| Wi-Fi driver | `AirPortRTW.kext` 1.3.0 (JoMei9019-real) |
 | Compatibility stack | `AMFIPass.kext`, `IOSkywalkFamily.kext`, `IO80211FamilyLegacy.kext` |
 | Disabled fallback | `AirPort_RTW88.kext` 2.0.1, FeiXiao `rtw88.kext` 1.0.1 + Starskiff |
 | Bluetooth firmware | `RealtekBluetoothFirmware.kext` |
@@ -118,7 +128,7 @@ Use the following settings:
 | CSM | Disabled |
 | IOMMU | Disabled |
 | Above 4G Decoding | Enabled |
-| UMA Frame Buffer | 1 GB or 2 GB with 16 GB RAM; this snapshot was tested with 2 GB |
+| UMA Frame Buffer | 2 GB recommended with 16 GB RAM |
 
 Do not change unfamiliar engineering or advanced BIOS options. Back up the BIOS settings and EFI before experimenting.
 
@@ -147,21 +157,25 @@ Adjust the target volume name as needed. The script should be run from Recovery.
 
 | Component | Version |
 |---|---|
-| NootedRed | 0.9.0 (steve12311 fork pre-release.15) |
+| NootedRed (weachy fork) | 1.2.7 |
+| RyzenHV | 0.7.8 + PR#16 fix |
 | Lilu | 1.7.2 |
 | VirtualSMC | 1.3.7 |
-| AppleALC | 1.9.8 |
+| AppleALC | 1.9.8 (custom layout 55 pin patch) |
+| AirPortRTW | 1.3.0 |
 | RestrictEvents | 1.1.6 |
 | RealtekRTL8111 | 3.0.0 |
-| AirPortRTW | 1.2.0 |
 | AirPort_RTW88 | 2.0.1 (disabled fallback) |
 | AMFIPass | 1.4.1 |
 | IO80211FamilyLegacy | 12.0 |
 | IOSkywalkFamily | 1.0 |
 | rtw88 fallback | 1.0.1 (disabled) |
+| BlueToolFixup | 2.7.2 |
 | VoodooI2C | 2.9.1 |
 | VoodooPS2Controller | 2.3.7 |
 | AMDRyzenCPUPowerManagement | 0.7.2 |
+| SMCAMDProcessor | 1.0.1 |
+| SMCRadeonSensors | 2.4.0 |
 | Display-2163-3cfb | Injector |
 
 NootedRed must load **before AppleALC**. One VoodooInput instance from VoodooI2C is used; the VoodooInput, Mouse, and Trackpad plugins bundled with VoodooPS2 are disabled to avoid conflicts.
@@ -174,10 +188,14 @@ NootedRed must load **before AppleALC**. One VoodooInput instance from VoodooI2C
 │   ├── BOOT
 │   └── OC
 │       ├── ACPI
+│       ├── Backup            (local archives, intentionally excluded from this repo)
 │       ├── Drivers
 │       ├── Kexts
+│       │   └── VERSIONS.txt
 │       ├── Resources
+│       ├── Tools             (OpenShell.efi rescue tool)
 │       ├── config.plist
+│       ├── config-legacy-wifi.plist
 │       └── OpenCore.efi
 ├── Extras
 ├── README.md
@@ -186,12 +204,13 @@ NootedRed must load **before AppleALC**. One VoodooInput instance from VoodooI2C
 └── SOURCES.txt
 ```
 
-Backup and debug files from the daily EFI are intentionally excluded.
+Backup and debug files from the daily EFI are intentionally excluded from this repository.
 
 ## Sources and credits
 
 - [OpenCorePkg](https://github.com/acidanthera/OpenCorePkg)
-- [NootedRed (ChefKissInc)](https://github.com/ChefKissInc/NootedRed) / [steve12311 fork](https://github.com/steve12311/NootedRed)
+- [NootedRed (ChefKissInc)](https://github.com/ChefKissInc/NootedRed) / [weachy fork](https://github.com/weachy/NootedRed)
+- [RyzenHV](https://github.com/overlorddev/RyzenHV)
 - [AMD Vanilla](https://github.com/AMD-OSX/AMD_Vanilla)
 - [VoodooI2C](https://github.com/VoodooI2C/VoodooI2C)
 - Airport_RTW88, FeiXiao/rtw88, Starskiff, and RealtekBluetoothFirmware

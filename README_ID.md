@@ -4,7 +4,7 @@
 
 OpenCore EFI untuk **Infinix XBOOK 15 BL51A5** dengan AMD Ryzen 7 5825U dan iGPU Radeon Vega 8.
 
-Snapshot ini diekspor dari EFI aktif pada **9 November 2026** dan ditujukan untuk **macOS Tahoe 26.7.1 (25G241)**.
+Snapshot ini diekspor dari EFI aktif pada **20 November 2026** dan ditujukan untuk **macOS Tahoe 26.7.1 (25G241)**.
 
 ![Instalasi macOS Tahoe pada Infinix XBOOK 15 BL51A5](docs/images/tahoe-26.5-about.png)
 
@@ -30,11 +30,12 @@ Snapshot ini menyertakan Legacy IO80211 stack (AMFIPass + IOSkywalkFamily + IO80
 | CPU | AMD Ryzen 7 5825U, 8 core / 16 thread |
 | iGPU | AMD Radeon Vega 8 / Barcelo, `1002:15e7` |
 | RAM saat pengujian | 16 GB DDR4-3200 |
+| UMA frame buffer | 2 GB (VRAM bersama; driver melaporkan carveout 2 GB) |
 | Storage | NVMe SSD |
 | Wi-Fi | Realtek RTL8821CE PCIe, `10ec:c821` |
 | Bluetooth | Realtek RTL8821C USB, `0bda:c821` |
 | Ethernet | Realtek RTL8111/8168 |
-| Audio | Realtek ALC269VC, layout-id 55 |
+| Audio | Realtek ALC269VC, layout-id 55 dengan patch pin kustom (lihat di bawah) |
 | Trackpad | I2C HID melalui VoodooI2C/VoodooI2CHID |
 | SMBIOS | MacBookPro16,2 |
 
@@ -42,10 +43,11 @@ Snapshot ini menyertakan Legacy IO80211 stack (AMFIPass + IOSkywalkFamily + IO80
 
 | Fitur | Status | Catatan |
 |---|---|---|
-| OpenCore picker dan boot macOS | ✅ Bekerja | macOS Tahoe 26.7.1 diuji langsung sebagai sistem utama |
+| Boot langsung ke macOS | ✅ Bekerja | Picker disembunyikan; tahan **Esc** saat boot untuk membukanya (rescue tools) |
 | CPU 8C/16T | ✅ Bekerja | Kernel patch AMD + ForgedInvariant |
 | CPU power management | ✅ Bekerja | AMDRyzenCPUPowerManagement, SMCAMDProcessor, dan SSDT-CPUR |
-| iGPU Vega 8 + Metal | ⚠️ Bekerja dengan keterbatasan | NootedRed memberi akselerasi; GPU reset atau artifact dapat terjadi pada aplikasi tertentu |
+| iGPU Vega 8 + Metal | ✅ Bekerja | NootedRed 1.2.7 (fork weachy); video Safari/browser berjalan halus |
+| Audio HDMI / DisplayPort | ⚠️ Belum diverifikasi | Didesain ulang di 1.2.7; tidak ada monitor eksternal untuk diuji di unit ini |
 | Internal display | ✅ Bekerja | Termasuk backlight dan injektor EDID/resolusi Hackintool (Display-2163-3cfb) |
 | Keyboard | ✅ Bekerja | VoodooPS2Controller |
 | Trackpad I2C | ✅ Bekerja | VoodooI2C + VoodooI2CHID; gesture tertentu dapat berbeda |
@@ -53,53 +55,61 @@ Snapshot ini menyertakan Legacy IO80211 stack (AMFIPass + IOSkywalkFamily + IO80
 | Battery status | ✅ Bekerja | SMCBatteryManager |
 | NVMe | ✅ Bekerja | NVMeFix aktif |
 | Ethernet | ✅ Driver aktif | RealtekRTL8111 |
-| Wi-Fi RTL8821CE | ✅ Bekerja | UI Wi-Fi native melalui AirPortRTW 1.2.0 (JoMei9019-real); WPA2/WPA3-Personal, auto-roaming, dan hardware CCMP |
-| Recovery Wi-Fi | ✅ Stabil | AirPortRTW 1.2.0 tersambung kembali cukup dengan toggle Wi-Fi off/on |
+| Wi-Fi RTL8821CE | ✅ Bekerja | UI Wi-Fi native melalui AirPortRTW 1.3.0 (JoMei9019-real); WPA2/WPA3-Personal, auto-roaming, dan hardware CCMP |
+| Recovery Wi-Fi | ✅ Stabil | AirPortRTW tersambung kembali cukup dengan toggle Wi-Fi off/on |
 | Bluetooth Realtek | ✅ Bekerja pada unit pengujian | RealtekBluetoothFirmware + BlueToolFixup |
 | AirDrop / AWDL / Continuity penuh | ❌ Tidak andal | AirPortRTW belum menyediakan dukungan AWDL/Continuity yang siap dipakai harian |
-| Audio | ✅ Bekerja | AppleALC setelah NootedRed, layout-id 55 |
+| Speaker + mic internal | ✅ Bekerja | AppleALC 1.9.8, layout-id 55, pin `0x1b` diubah dari JACK ke FIXED untuk mematikan jack detection |
+| Jack combo 3,5 mm | ❌ Tidak bekerja | Topologi jack layout 55 tidak cocok; gunakan audio USB/Bluetooth |
 | Sleep/wake | ✅ Bekerja pada unit pengujian | Tetap uji setelah mengubah USB mapping, Bluetooth, atau versi macOS |
-| DRM / streaming protected content | ⚠️ Tidak dijamin | `unfairgva=1` sengaja dihapus karena tidak memperbaiki reset GPU |
+| Docker Desktop | ✅ Bekerja | RyzenHV 0.7.8 + PR#16, engine HyperKit, VM 12 CPU / 4096 MiB; jalankan `~/ryzenhv-0.7.8/docker-fix-pid.sh --restart` jika HyperKit macet |
+| DRM / streaming protected content | ⚠️ Tidak dijamin | Gunakan browser berbasis Chromium untuk Widevine; FairPlay di Safari terbatas di AMD Hackintosh |
 
-## Batasan grafis NootedRed
+## Perilaku boot
 
-EFI ini sekarang memakai **NootedRed 0.9.0 (steve12311 fork pre-release.15)** dengan boot argument `-NRedDisplayFix -NRedVideoFix` untuk meningkatkan stabilitas iGPU AMD Renoir/Cezanne. Akselerasi grafis bekerja pada unit pengujian, tetapi keterbatasan NootedRed tetap dapat berbeda tergantung versi macOS dan beban kerja.
+Boot picker disembunyikan agar mesin langsung masuk ke macOS:
 
-Gejala pada build sebelumnya yang pernah terkonfirmasi melalui laporan `.gpuRestart`:
+```text
+Misc > Boot > ShowPicker = false
+Misc > Security > ScanPolicy = 17760515 (0x10F0103)
+```
 
-- Safari/WebKit dapat tersendat atau reset saat memutar video.
-- App Store dan `mediaanalysisd` juga dapat memicu reset pada shader `VTMTSComputeFunction`.
-- Menambah UMA dari 512 MB ke 1 GB membantu ruang grafis, tetapi tidak menyelesaikan bug driver.
+Hanya APFS dan perangkat NVMe/SATA/PCI internal yang dipindai. Ini menyembunyikan partisi Linux (ext4) dari picker agar tidak terpilih sebagai default. **Tahan `Esc` saat boot** untuk membuka picker saat membutuhkan `UEFI Shell (rescue)`.
 
-Akselerasi grafis tersedia, tetapi stabilitas bergantung pada aplikasi dan build macOS. GPU reset pernah tercatat, dan aplikasi Chromium/Electron seperti Discord, Spotify, Termius, dan Brave dapat menampilkan artifact ketika hardware acceleration aktif.
+## Catatan NootedRed dan AMD
 
-Workaround harian:
+Snapshot ini memakai **NootedRed 1.2.7 (fork weachy)**. Mulai v1.2.0, GLFix, perbaikan Metal, optimasi OpenCL, VDA hardware video (AVC + HEVC), dan audio HDMI/DP aktif secara default — tidak perlu boot argument khusus. Semua perbaikan bersifat opt-out lewat flag seperti `-NRedNoVDA`, `-NRedNoGLFix`, dan `-NRedDebug`.
 
-- Jalankan aplikasi Electron bermasalah dengan `--disable-gpu`.
-- Matikan graphics acceleration pada browser jika stabilitas lebih penting.
-- Gunakan wallpaper solid bila wallpaper dinamis memicu reset.
-- Jalankan `Extras/fix-nootedred.sh` setelah fresh install jika desktop/login mengalami hang.
-- Dengan RAM 16 GB, UMA 2 GB dapat dicoba. Gunakan 1 GB bila ingin menyisakan lebih banyak RAM untuk sistem.
+v1.2.7 menambahkan pipeline `NRedAudio` berbasis event yang memprogram register audio DCN (Azalia, DCCG, AFMT, DP_SEC) serta perbaikan hotplug DisplayPort dan recovery saat monitor dimatikan. Di unit ini, pemutaran video di Safari/browser berjalan halus dan sistem terasa responsif.
+
+Catatan harian:
+
+- NootedRed harus dimuat **sebelum AppleALC**.
+- Jangan pakai WhateverGreen atau BFixup bersamaan dengan NootedRed.
+- AMFIPass.kext, `amfi_get_out_of_my_way=0x1`, dan `csr-active-config=03080000` tetap dipertahankan karena RyzenHV membutuhkan AMFI rileks untuk patching HyperKit di memori. Jangan hapus hanya karena rilis NootedRed terbaru tidak lagi mensyaratkannya.
+- UMA 2 GB bekerja baik dengan RAM 16 GB.
 
 Boot arguments snapshot ini:
 
 ```text
-revcpu=1 -NRedDPDelay -amfipassbeta -NRedDisplayFix -NRedVideoFix
+revcpu=1 -NRedDPDelay -amfipassbeta rhv_enable_svm=1 rhv_allow_users=1 rhv_hv=1 amfi_get_out_of_my_way=0x1 ipc_control_port_options=0 rhv_selftest=1
 ```
 
-- `-NRedDisplayFix -NRedVideoFix`: Mitigasi freeze layar dan pemutaran video pada NootedRed 0.9.0.
-- `-amfipassbeta`: Memastikan kompatibilitas AMFI pass-through untuk legacy Wi-Fi stack pada versi macOS terbaru.
-- `-NRedDPDelay`: Mengatasi delay display port timing pada panel internal.
+- `rhv_*`: mengaktifkan mode SVM native RyzenHV, mengizinkan user non-root, mengaktifkan hypervisor HyperKit, dan menjalankan self-test-nya.
+- `amfi_get_out_of_my_way=0x1` + `-amfipassbeta`: AMFI rileks untuk patching HyperKit di memori dan legacy Wi-Fi stack.
+- `ipc_control_port_options=0`: opsi kompatibilitas yang tetap dipakai untuk Docker/HyperKit.
+- `-NRedDPDelay`: mengatasi delay display port timing pada panel internal.
+- `revcpu=1`: override revisi CPU yang dibutuhkan patch AMD.
 
 ## Wi-Fi dan Bluetooth
 
-Snapshot ini memakai AirPortRTW 1.2.0 (JoMei9019-real) bersama Legacy IO80211 stack sehingga RTL8821CE tampil di UI Wi-Fi native Apple pada Sonoma, Sequoia, dan Tahoe. `AirPort_RTW88.kext` (v2.0.1) dan `rtw88.kext` FeiXiao lama tetap disimpan sebagai fallback dalam keadaan disabled dan tidak boleh diaktifkan bersamaan.
+Snapshot ini memakai AirPortRTW 1.3.0 (JoMei9019-real) bersama Legacy IO80211 stack sehingga RTL8821CE tampil di UI Wi-Fi native Apple pada Sonoma, Sequoia, dan Tahoe. `AirPort_RTW88.kext` (v2.0.1) dan `rtw88.kext` FeiXiao lama tetap disimpan sebagai fallback dalam keadaan disabled dan tidak boleh diaktifkan bersamaan.
 
 Komponen:
 
 | Peran | Komponen |
 |---|---|
-| Driver Wi-Fi | `AirPortRTW.kext` 1.2.0 (JoMei9019-real) |
+| Driver Wi-Fi | `AirPortRTW.kext` 1.3.0 (JoMei9019-real) |
 | Compatibility stack | `AMFIPass.kext`, `IOSkywalkFamily.kext`, `IO80211FamilyLegacy.kext` |
 | Fallback disabled | `AirPort_RTW88.kext` 2.0.1, FeiXiao `rtw88.kext` 1.0.1 + Starskiff |
 | Firmware Bluetooth | `RealtekBluetoothFirmware.kext` |
@@ -118,7 +128,7 @@ Gunakan pengaturan berikut:
 | CSM | Disabled |
 | IOMMU | Disabled |
 | Above 4G Decoding | Enabled |
-| UMA Frame Buffer | 1 GB atau 2 GB untuk RAM 16 GB; snapshot diuji dengan 2 GB |
+| UMA Frame Buffer | 2 GB disarankan untuk RAM 16 GB |
 
 Jangan mengubah menu engineer/advanced yang tidak dipahami. Backup setting BIOS dan EFI sebelum eksperimen.
 
@@ -147,21 +157,25 @@ Sesuaikan nama volume target. Script sebaiknya dijalankan dari Recovery.
 
 | Komponen | Versi |
 |---|---|
-| NootedRed | 0.9.0 (steve12311 fork pre-release.15) |
+| NootedRed (fork weachy) | 1.2.7 |
+| RyzenHV | 0.7.8 + perbaikan PR#16 |
 | Lilu | 1.7.2 |
 | VirtualSMC | 1.3.7 |
-| AppleALC | 1.9.8 |
+| AppleALC | 1.9.8 (patch layout 55 kustom) |
+| AirPortRTW | 1.3.0 |
 | RestrictEvents | 1.1.6 |
 | RealtekRTL8111 | 3.0.0 |
-| AirPortRTW | 1.2.0 |
 | AirPort_RTW88 | 2.0.1 (fallback disabled) |
 | AMFIPass | 1.4.1 |
 | IO80211FamilyLegacy | 12.0 |
 | IOSkywalkFamily | 1.0 |
 | rtw88 fallback | 1.0.1 (disabled) |
+| BlueToolFixup | 2.7.2 |
 | VoodooI2C | 2.9.1 |
 | VoodooPS2Controller | 2.3.7 |
 | AMDRyzenCPUPowerManagement | 0.7.2 |
+| SMCAMDProcessor | 1.0.1 |
+| SMCRadeonSensors | 2.4.0 |
 | Display-2163-3cfb | Injector |
 
 NootedRed harus dimuat **sebelum AppleALC**. Satu instance VoodooInput dari VoodooI2C digunakan; plugin VoodooInput, Mouse, dan Trackpad milik VoodooPS2 dinonaktifkan untuk menghindari konflik.
@@ -174,10 +188,14 @@ NootedRed harus dimuat **sebelum AppleALC**. Satu instance VoodooInput dari Vood
 │   ├── BOOT
 │   └── OC
 │       ├── ACPI
+│       ├── Backup            (arsip lokal, sengaja tidak masuk repo)
 │       ├── Drivers
 │       ├── Kexts
+│       │   └── VERSIONS.txt
 │       ├── Resources
+│       ├── Tools             (OpenShell.efi rescue tool)
 │       ├── config.plist
+│       ├── config-legacy-wifi.plist
 │       └── OpenCore.efi
 ├── Extras
 ├── README.md
@@ -186,12 +204,13 @@ NootedRed harus dimuat **sebelum AppleALC**. Satu instance VoodooInput dari Vood
 └── SOURCES.txt
 ```
 
-File backup/debug dari EFI harian sengaja tidak ikut dimasukkan.
+File backup/debug dari EFI harian sengaja tidak ikut dimasukkan ke repo ini.
 
 ## Sumber dan kredit
 
 - [OpenCorePkg](https://github.com/acidanthera/OpenCorePkg)
-- [NootedRed (ChefKissInc)](https://github.com/ChefKissInc/NootedRed) / [steve12311 fork](https://github.com/steve12311/NootedRed)
+- [NootedRed (ChefKissInc)](https://github.com/ChefKissInc/NootedRed) / [fork weachy](https://github.com/weachy/NootedRed)
+- [RyzenHV](https://github.com/overlorddev/RyzenHV)
 - [AMD Vanilla](https://github.com/AMD-OSX/AMD_Vanilla)
 - [VoodooI2C](https://github.com/VoodooI2C/VoodooI2C)
 - Airport_RTW88, FeiXiao/rtw88, Starskiff, dan RealtekBluetoothFirmware
