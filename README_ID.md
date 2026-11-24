@@ -60,7 +60,7 @@ Snapshot ini menyertakan Legacy IO80211 stack (AMFIPass + IOSkywalkFamily + IO80
 | Bluetooth Realtek | ✅ Bekerja pada unit pengujian | RealtekBluetoothFirmware + BlueToolFixup |
 | AirDrop / AWDL / Continuity penuh | ❌ Tidak andal | AirPortRTW belum menyediakan dukungan AWDL/Continuity yang siap dipakai harian |
 | Speaker + mic internal | ✅ Bekerja | AppleALC 1.9.8, layout-id 120 (XBOOK B15). Built-in Output sekarang jadi device default dan memetakan ke speaker internal. |
-| Jack combo 3,5 mm | ⚠️ Belum diverifikasi | Layout 120 dibuat khusus laptop ini dan mungkin mengekspos jack; belum diuji di unit ini |
+| Jack combo 3,5 mm | ✅ Bekerja | Terverifikasi dengan layout 120 di unit ini — headphone/headset terdeteksi dengan benar |
 | Sleep/wake | ✅ Bekerja pada unit pengujian | Tetap uji setelah mengubah USB mapping, Bluetooth, atau versi macOS |
 | Docker Desktop | ✅ Bekerja | RyzenHV 0.7.8 + PR#16, engine HyperKit, VM 12 CPU / 4096 MiB; jalankan `~/ryzenhv-0.7.8/docker-fix-pid.sh --restart` jika HyperKit macet |
 | DRM / streaming protected content | ⚠️ Tidak dijamin | Gunakan browser berbasis Chromium untuk Widevine; FairPlay di Safari terbatas di AMD Hackintosh |

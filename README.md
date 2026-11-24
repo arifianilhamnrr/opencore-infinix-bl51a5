@@ -60,7 +60,7 @@ This snapshot contains the Legacy IO80211 stack (AMFIPass + IOSkywalkFamily + IO
 | Realtek Bluetooth | ✅ Working on the tested unit | RealtekBluetoothFirmware + BlueToolFixup |
 | Full AirDrop / AWDL / Continuity | ❌ Not reliable | AirPortRTW does not provide production-ready AWDL/Continuity support |
 | Internal speakers + mic | ✅ Working | AppleALC 1.9.8, layout-id 120 (XBOOK B15). Built-in Output is now the default device and maps to the internal speakers. |
-| 3.5 mm combo jack | ⚠️ Unverified | Layout 120 was made for this laptop and may expose the jack; not tested on this unit yet |
+| 3.5 mm combo jack | ✅ Working | Verified with layout 120 on this unit — headphones/headset are detected correctly |
 | Sleep/wake | ✅ Working on the tested unit | Retest after changing the USB map, Bluetooth stack, or macOS version |
 | Docker Desktop | ✅ Working | RyzenHV 0.7.8 + PR#16, HyperKit engine, 12 CPUs / 4096 MiB VM; use `~/ryzenhv-0.7.8/docker-fix-pid.sh --restart` if HyperKit wedges |
 | DRM / protected streaming content | ⚠️ Not guaranteed | Use Chromium-based browsers for Widevine; FairPlay on Safari is limited on AMD Hackintoshes |
