@@ -35,7 +35,7 @@ Snapshot ini menyertakan Legacy IO80211 stack (AMFIPass + IOSkywalkFamily + IO80
 | Wi-Fi | Realtek RTL8821CE PCIe, `10ec:c821` |
 | Bluetooth | Realtek RTL8821C USB, `0bda:c821` |
 | Ethernet | Realtek RTL8111/8168 |
-| Audio | Realtek ALC269VC, layout-id 55 dengan patch pin kustom (lihat di bawah) |
+| Audio | Realtek ALC269VC, layout-id 120 (kodeaqua, untuk Infinix XBOOK B15) |
 | Trackpad | I2C HID melalui VoodooI2C/VoodooI2CHID |
 | SMBIOS | MacBookPro16,2 |
 
@@ -59,8 +59,8 @@ Snapshot ini menyertakan Legacy IO80211 stack (AMFIPass + IOSkywalkFamily + IO80
 | Recovery Wi-Fi | ✅ Stabil | AirPortRTW tersambung kembali cukup dengan toggle Wi-Fi off/on |
 | Bluetooth Realtek | ✅ Bekerja pada unit pengujian | RealtekBluetoothFirmware + BlueToolFixup |
 | AirDrop / AWDL / Continuity penuh | ❌ Tidak andal | AirPortRTW belum menyediakan dukungan AWDL/Continuity yang siap dipakai harian |
-| Speaker + mic internal | ✅ Bekerja | AppleALC 1.9.8, layout-id 55, pin `0x1b` diubah dari JACK ke FIXED untuk mematikan jack detection |
-| Jack combo 3,5 mm | ❌ Tidak bekerja | Topologi jack layout 55 tidak cocok; gunakan audio USB/Bluetooth |
+| Speaker + mic internal | ✅ Bekerja | AppleALC 1.9.8, layout-id 120 (XBOOK B15). Built-in Output sekarang jadi device default dan memetakan ke speaker internal. |
+| Jack combo 3,5 mm | ⚠️ Belum diverifikasi | Layout 120 dibuat khusus laptop ini dan mungkin mengekspos jack; belum diuji di unit ini |
 | Sleep/wake | ✅ Bekerja pada unit pengujian | Tetap uji setelah mengubah USB mapping, Bluetooth, atau versi macOS |
 | Docker Desktop | ✅ Bekerja | RyzenHV 0.7.8 + PR#16, engine HyperKit, VM 12 CPU / 4096 MiB; jalankan `~/ryzenhv-0.7.8/docker-fix-pid.sh --restart` jika HyperKit macet |
 | DRM / streaming protected content | ⚠️ Tidak dijamin | Gunakan browser berbasis Chromium untuk Widevine; FairPlay di Safari terbatas di AMD Hackintosh |
@@ -162,7 +162,7 @@ Sesuaikan nama volume target. Script sebaiknya dijalankan dari Recovery.
 | RyzenHV | 0.7.8 + perbaikan PR#16 |
 | Lilu | 1.7.2 |
 | VirtualSMC | 1.3.7 |
-| AppleALC | 1.9.8 (patch layout 55 kustom) |
+| AppleALC | 1.9.8 (layout-id 120) |
 | AirPortRTW | 1.3.0 |
 | RestrictEvents | 1.1.6 |
 | RealtekRTL8111 | 3.0.0 |

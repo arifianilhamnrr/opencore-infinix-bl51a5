@@ -35,7 +35,7 @@ This snapshot contains the Legacy IO80211 stack (AMFIPass + IOSkywalkFamily + IO
 | Wi-Fi | Realtek RTL8821CE PCIe, `10ec:c821` |
 | Bluetooth | Realtek RTL8821C USB, `0bda:c821` |
 | Ethernet | Realtek RTL8111/8168 |
-| Audio | Realtek ALC269VC, layout-id 55 with a custom pin patch (see below) |
+| Audio | Realtek ALC269VC, layout-id 120 (kodeaqua, for Infinix XBOOK B15) |
 | Trackpad | I2C HID through VoodooI2C/VoodooI2CHID |
 | SMBIOS | MacBookPro16,2 |
 
@@ -59,8 +59,8 @@ This snapshot contains the Legacy IO80211 stack (AMFIPass + IOSkywalkFamily + IO
 | Wi-Fi recovery | ✅ Stable | AirPortRTW reconnects reliably with a simple Wi-Fi off/on toggle |
 | Realtek Bluetooth | ✅ Working on the tested unit | RealtekBluetoothFirmware + BlueToolFixup |
 | Full AirDrop / AWDL / Continuity | ❌ Not reliable | AirPortRTW does not provide production-ready AWDL/Continuity support |
-| Internal speakers + mic | ✅ Working | AppleALC 1.9.8, layout-id 55, custom pin `0x1b` changed from JACK to FIXED to disable jack detection |
-| 3.5 mm combo jack | ❌ Not working | Layout 55 has an incompatible jack topology; USB/Bluetooth audio is recommended |
+| Internal speakers + mic | ✅ Working | AppleALC 1.9.8, layout-id 120 (XBOOK B15). Built-in Output is now the default device and maps to the internal speakers. |
+| 3.5 mm combo jack | ⚠️ Unverified | Layout 120 was made for this laptop and may expose the jack; not tested on this unit yet |
 | Sleep/wake | ✅ Working on the tested unit | Retest after changing the USB map, Bluetooth stack, or macOS version |
 | Docker Desktop | ✅ Working | RyzenHV 0.7.8 + PR#16, HyperKit engine, 12 CPUs / 4096 MiB VM; use `~/ryzenhv-0.7.8/docker-fix-pid.sh --restart` if HyperKit wedges |
 | DRM / protected streaming content | ⚠️ Not guaranteed | Use Chromium-based browsers for Widevine; FairPlay on Safari is limited on AMD Hackintoshes |
@@ -162,7 +162,7 @@ Adjust the target volume name as needed. The script should be run from Recovery.
 | RyzenHV | 0.7.8 + PR#16 fix |
 | Lilu | 1.7.2 |
 | VirtualSMC | 1.3.7 |
-| AppleALC | 1.9.8 (custom layout 55 pin patch) |
+| AppleALC | 1.9.8 (layout-id 120) |
 | AirPortRTW | 1.3.0 |
 | RestrictEvents | 1.1.6 |
 | RealtekRTL8111 | 3.0.0 |
