@@ -46,8 +46,8 @@ This snapshot contains the Legacy IO80211 stack (AMFIPass + IOSkywalkFamily + IO
 | Direct boot to macOS | ✅ Working | Picker is hidden; hold **Esc** at boot to open it for rescue tools |
 | CPU 8C/16T | ✅ Working | AMD kernel patches + ForgedInvariant |
 | CPU power management | ✅ Working | AMDRyzenCPUPowerManagement, SMCAMDProcessor, and SSDT-CPUR |
-| Vega 8 iGPU + Metal | ✅ Working | NootedRed 1.3.0 (weachy fork); smooth video playback in Safari and browsers |
-| HDMI / DisplayPort audio | ⚠️ Unverified | Redesigned in 1.3.0; no external display available to test on this unit |
+| Vega 8 iGPU + Metal | ✅ Working | NootedRed 1.3.2 (weachy fork); smooth video playback in Safari and browsers |
+| HDMI / DisplayPort audio | ⚠️ Unverified | Redesigned in 1.3.2; no external display available to test on this unit |
 | Internal display | ✅ Working | Includes backlight control and Hackintool EDID/scale injector (Display-2163-3cfb) |
 | Keyboard | ✅ Working | VoodooPS2Controller |
 | I2C trackpad | ✅ Working | VoodooI2C + VoodooI2CHID; individual gestures may vary |
@@ -55,7 +55,7 @@ This snapshot contains the Legacy IO80211 stack (AMFIPass + IOSkywalkFamily + IO
 | Battery status | ✅ Working | SMCBatteryManager |
 | NVMe | ✅ Working | NVMeFix enabled |
 | Ethernet | ✅ Driver active | RealtekRTL8111 |
-| RTL8821CE Wi-Fi | ✅ Working | Native Wi-Fi UI through AirPortRTW 1.3.0 (JoMei9019-real); WPA2/WPA3-Personal, auto-roaming, and hardware CCMP |
+| RTL8821CE Wi-Fi | ✅ Working | Native Wi-Fi UI through AirPortRTW 1.3.2 (JoMei9019-real); WPA2/WPA3-Personal, auto-roaming, and hardware CCMP |
 | Wi-Fi recovery | ✅ Stable | AirPortRTW reconnects reliably with a simple Wi-Fi off/on toggle |
 | Realtek Bluetooth | ✅ Working on the tested unit | RealtekBluetoothFirmware + BlueToolFixup |
 | Full AirDrop / AWDL / Continuity | ❌ Not reliable | AirPortRTW does not provide production-ready AWDL/Continuity support |
@@ -78,9 +78,9 @@ Only APFS and internal NVMe/SATA/PCI devices are scanned. This hides the Linux e
 
 ## NootedRed and AMD notes
 
-This snapshot uses **NootedRed 1.3.0 (weachy fork)**. From v1.2.0 onward GLFix, Metal fixes, OpenCL optimisation, VDA hardware video (AVC + HEVC), and HDMI/DP audio are enabled by default — no opt-in boot arguments are needed. All fixes are opt-out flags such as `-NRedNoVDA`, `-NRedNoGLFix`, and `-NRedDebug`.
+This snapshot uses **NootedRed 1.3.2 (weachy fork)**. From v1.2.0 onward GLFix, Metal fixes, OpenCL optimisation, VDA hardware video (AVC + HEVC), and HDMI/DP audio are enabled by default — no opt-in boot arguments are needed. All fixes are opt-out flags such as `-NRedNoVDA`, `-NRedNoGLFix`, and `-NRedDebug`.
 
-v1.3.0 adds an event-driven `NRedAudio` pipeline that programs the DCN audio registers (Azalia, DCCG, AFMT, DP_SEC) and improves DisplayPort hotplug / monitor power-off recovery. On this unit, Safari and browser video playback is smooth and the system is responsive.
+v1.3.2 adds an event-driven `NRedAudio` pipeline that programs the DCN audio registers (Azalia, DCCG, AFMT, DP_SEC) and improves DisplayPort hotplug / monitor power-off recovery. On this unit, Safari and browser video playback is smooth and the system is responsive.
 
 Daily-use notes:
 
@@ -100,17 +100,17 @@ revcpu=1 -NRedDPDelay -amfipassbeta rhv_enable_svm=1 rhv_allow_users=1 rhv_hv=1 
 - `ipc_control_port_options=0`: compatibility option retained for Docker/HyperKit.
 - `-NRedDPDelay`: workaround for display port timing delays on the internal panel.
 - `revcpu=1`: CPU revision override required by the AMD patches.
-- `-NRedNoVP9`: disables hardware VP9 decoding. v1.3.0 requires SIP to be fully disabled for VP9; this EFI keeps SIP relaxed (`03080000`) for RyzenHV, so VP9 is disabled to avoid `SIGKILL (Code Signature Invalid)` in Hardened Runtime apps. All other v1.3.0 features (AVC/HEVC Main10/8K, Metal, GLFix, low-VRAM optimisations, HDMI/DP audio) remain active.
+- `-NRedNoVP9`: disables hardware VP9 decoding. v1.3.2 requires SIP to be fully disabled for VP9; this EFI keeps SIP relaxed (`03080000`) for RyzenHV, so VP9 is disabled to avoid `SIGKILL (Code Signature Invalid)` in Hardened Runtime apps. All other v1.3.2 features (AVC/HEVC Main10/8K, Metal, GLFix, low-VRAM optimisations, HDMI/DP audio) remain active.
 
 ## Wi-Fi and Bluetooth
 
-This snapshot uses AirPortRTW 1.3.0 (JoMei9019-real) with the restored Legacy IO80211 stack so RTL8821CE appears in Apple's native Wi-Fi interface on Sonoma, Sequoia, and Tahoe. `AirPort_RTW88.kext` (v2.0.1) and the older FeiXiao `rtw88.kext` remain in the EFI as disabled fallbacks and must not be enabled at the same time.
+This snapshot uses AirPortRTW 1.3.2 (JoMei9019-real) with the restored Legacy IO80211 stack so RTL8821CE appears in Apple's native Wi-Fi interface on Sonoma, Sequoia, and Tahoe. `AirPort_RTW88.kext` (v2.0.1) and the older FeiXiao `rtw88.kext` remain in the EFI as disabled fallbacks and must not be enabled at the same time.
 
 Components:
 
 | Role | Component |
 |---|---|
-| Wi-Fi driver | `AirPortRTW.kext` 1.3.0 (JoMei9019-real) |
+| Wi-Fi driver | `AirPortRTW.kext` 1.3.2 (JoMei9019-real) |
 | Compatibility stack | `AMFIPass.kext`, `IOSkywalkFamily.kext`, `IO80211FamilyLegacy.kext` |
 | Disabled fallback | `AirPort_RTW88.kext` 2.0.1, FeiXiao `rtw88.kext` 1.0.1 + Starskiff |
 | Bluetooth firmware | `RealtekBluetoothFirmware.kext` |
@@ -158,12 +158,12 @@ Adjust the target volume name as needed. The script should be run from Recovery.
 
 | Component | Version |
 |---|---|
-| NootedRed (weachy fork) | 1.3.0 |
+| NootedRed (weachy fork) | 1.3.2 |
 | RyzenHV | 0.7.8 + PR#16 fix |
 | Lilu | 1.7.2 |
 | VirtualSMC | 1.3.7 |
 | AppleALC | 1.9.8 (layout-id 120) |
-| AirPortRTW | 1.3.0 |
+| AirPortRTW | 1.3.2 |
 | RestrictEvents | 1.1.6 |
 | RealtekRTL8111 | 3.0.0 |
 | AirPort_RTW88 | 2.0.1 (disabled fallback) |
